@@ -5,7 +5,7 @@ setup(
     version='1.0',
     entry_points={
         'console_scripts': [
-            'medium-stats = medium_stats.main:main'
+            'medium-stats = medium_stats.__main__:main'
         ]
     },
     packages=find_packages(),
