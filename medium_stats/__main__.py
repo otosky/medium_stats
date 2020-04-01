@@ -174,10 +174,8 @@ def main():
         for m in remaining:
             if m == 'events':
                 data = get_stats(me, m, me.now)
-                print(data)
             else:
                 data = get_stats(me, m, me.now, articles)
-                print(data)
             write_stats(me, data, m, me.now, sub_dir)
     
     print('All done!')
