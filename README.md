@@ -138,7 +138,7 @@ Note: "summary_stats" and "referrer" data pre-aggregates to your full history,
 i.e. they don't take into account "start" & "stop" parameters.
 
 #### Example output:
-`data` or "--mode summary":
+`data` (summary):
 ```
 [   {   'claps': 3,
         'collectionId': '',
@@ -166,7 +166,7 @@ i.e. they don't take into account "start" & "stop" parameters.
         ...
 ```
 
-`data_events` or "--mode events":
+`data_events`:
 ```
 [{  'claps': 0,
     'flaggedSpam': 0,
@@ -179,7 +179,7 @@ i.e. they don't take into account "start" & "stop" parameters.
         ...
 ```
 
-`article_events` or "--mode articles":
+`article_events`:
 ```
 {'data': {
     'post': [{
@@ -206,7 +206,7 @@ i.e. they don't take into account "start" & "stop" parameters.
 }
 ```
 
-`referrers` or "--mode referrers":
+`referrers`:
 ```
 {'data': {'post': [{'__typename': 'Post',
                     'id': 'POST_ID',
