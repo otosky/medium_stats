@@ -9,7 +9,7 @@ you with the data as it is pre-rendered.*
 ## Install
 
 ```bash
-$ pip install medium_stats
+$ pip install medium-stats
 ```
 
 ## Setup
@@ -49,7 +49,7 @@ EOF
 *If you want to automatically find and store your cookies:*
 
 ```bash
-$ pip install medium_stats[selenium]
+$ pip install medium-stats[selenium]
 ```
 
 This installs some extra dependencies allowing a webscraper to authenticate to Medium
