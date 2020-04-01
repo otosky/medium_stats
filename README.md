@@ -1,10 +1,10 @@
 # Medium Stats Scraper
 
-A command-line tool and Python package that fetches your Medium profile statistics 
-and saves the data as JSON.
+A command-line tool and Python package to fetch your Medium profile statistics 
+and save the data as JSON.
 
-Executes the same API and Graphql requests as the Medium front-end does, providing you
-the data as it is pre-rendered.
+*Executes the same API and Graphql requests as the Medium front-end does, providing you
+the data as it is pre-rendered.*
 
 ## Install
 
@@ -21,12 +21,14 @@ needs **two** cookies from a signed-in Medium session - "sid" and "uid".
 
 *If you want to manually find and store your cookies:*
 
-![](readme_extras/cookie_howto.gif)
 - Sign in to Medium
 - Get to your browser's developer tools and find the tab that holds cookies:
   - *Application* for Chrome 
   - *Storage* for Firefox
 - Scroll through the cookies for medium.com until you find 'sid' and 'uid'
+
+
+![](readme_extras/cookie_howto.gif)
 
 Create a `.medium_creds.ini` file to hold these cookie values:
 
@@ -86,7 +88,9 @@ target_stats_directory/
 
 Simple Use: 
 
-`$ medium-stats scrape -u [USERNAME] --all`
+```
+$ medium-stats scrape -u [USERNAME] --all
+```
 
 > This will get all Medium stats until now. 
 
@@ -111,7 +115,7 @@ FLAGS:
 ### Python
 
 Basic Usage:
-```
+```python
 from medium_stats.scraper import StatGrabber
 
 # get aggregated summary statistics; NOTE: "start" & "stop" params also accept datetime objects
@@ -208,7 +212,7 @@ i.e. they don't take into account "start" & "stop" parameters.
 
 If you set up your credentials file already, there is a helper class `MediumConfigHelper`,
 that wraps the standard `configparser`:
-```
+```python
 import os
 from medium_stats.cli import MediumConfigHelper
 default_creds = os.path.join(os.path.expanduser('~'), '.medium_creds.ini')
