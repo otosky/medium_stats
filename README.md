@@ -179,7 +179,7 @@ i.e. they don't take into account "start" & "stop" parameters.
         ...
 ```
 
-`articles` or "--mode articles":
+`article_events` or "--mode articles":
 ```
 {'data': {
     'post': [{
