@@ -74,21 +74,19 @@ def get_stats(sg, mode, now, articles=None):
         data = {'data': {'events': non_attrib_events}}
 
     elif mode == 'articles':
-        data = {'data': {'post': []}}
-
-        for a in articles:
-            post_views = sg.get_story_stats(a)
-            data['data']['post'] += [post_views['data']['post']]
+        
+        data = sg.get_all_story_stats(articles)
+        
     elif mode == 'referrers':
-        data = {'data': {'post': []}}
-        for a in articles:
-            post_referrers = sg.get_story_stats(a, type_='referrer')
-            data['data']['post'] += [post_referrers['data']['post']]
+        
+        data = sg.get_all_story_stats(articles, type_='referrer')
+        
     else:
         raise ValueError('"mode" param must be of choice {summary, events, articles, referrers}')
     
     extras = template_data(mode)
-    return data.update(extras)
+    
+    return {**data, **extras}
 
 def write_stats(sg, data, mode, now, sub_dir):
 
@@ -176,51 +174,13 @@ def main():
         for m in remaining:
             if m == 'events':
                 data = get_stats(me, m, me.now)
+                print(data)
             else:
                 data = get_stats(me, m, me.now, articles)
+                print(data)
             write_stats(me, data, m, me.now, sub_dir)
     
     print('All done!')
-
-################################################################################ 
-### GET SUMMARY STATS
-################################################################################ 
-
-# ################################################################################ 
-# ### GET EVENT LOGS
-# ################################################################################
-
-# ################################################################################ 
-# ### GET ARTICLE STATS
-# ################################################################################
-#     posts = {'data': {'post': []},
-#              'periodBegin': period_start,
-#              'periodEnd': period_stop,
-#              'type': 'postEvents'
-#     }
-#     referrers = {'data': {'post': []},
-#                  'timestamp': now_json,
-#                  'type': 'referrers'
-#     }
-#     print(f'Getting Article Stats for {len(articles)} articles...', end='\n\n')
-#     for a in articles:
-#         post_views = me.get_story_stats(a)
-#         posts['data']['post'] += [post_views['data']['post']]
-        
-#         post_referrers = me.get_story_stats(a, type_='referrer')
-#         referrers['data']['post'] += [post_referrers['data']['post']]
-    
-#     #filename = f'{sub_dir}/post_events/{period_stop_f}_{period_start_f}_post_events.json'
-#     #path = me.write_json(posts, filename)
-#     print('Article Event Logs written to:')
-#     print(path, end='\n\n')
-    
-#     #filename = f'{sub_dir}/post_referrers/{now_prefix}_post_referrers.json'
-#     #path = me.write_json(referrers, filename)
-#     print('Referrer Data written to:')
-#     print(path, section_break, sep='\n')
-
-#     print('All done!')
 
 if __name__=="__main__":
     main()
