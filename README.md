@@ -3,8 +3,8 @@
 A command-line tool and Python package to fetch your Medium profile statistics 
 and save the data as JSON.
 
-*Executes the same API and Graphql requests as the Medium front-end does, providing you
-the data as it is pre-rendered.*
+*Executes the same API and Graphql requests as the Medium front-end does, providing 
+you with the data as it is pre-rendered.*
 
 ## Install
 
@@ -44,6 +44,8 @@ EOF
 #pass that path as an argument to the CLI tool.
 ```
 
+***
+
 *If you want to automatically find and store your cookies:*
 
 ```bash
@@ -51,8 +53,8 @@ $ pip install medium_stats[selenium]
 ```
 
 This installs some extra dependencies allowing a webscraper to authenticate to Medium
-on your behalf and grab your sid and uid cookies.  Note: You must already have 
-Chrome installed.
+on your behalf and grab your "sid" and "uid" cookies.  *Note: You must already have 
+Chrome installed.*
 
 Currently only valid for Gmail OAuth:
 
@@ -64,9 +66,9 @@ $ export MEDIUM_AUTH_PWD='[PASSWORD]'
 $ medium-stats fetch-cookies --email [EMAIL] --pwd-in-env
 ```
 
-### Step 2:
+### Step 2 - *Optional*:
 
-Create a directory for your stats exports [optional]; the CLI tool will run 
+Create a directory for your stats exports; the CLI tool will run 
 under the working directory by default.
 
 ```bash
@@ -138,7 +140,7 @@ for article in articles:
     referrers['data']['post'] += list(refs['data']['post'])
 ```
 
-Note: summary_stats and referrer data pre-aggregates to your full history, 
+Note: "summary_stats" and "referrer" data pre-aggregates to your full history, 
 i.e. they don't take into account "start" & "stop" parameters.
 
 #### Example output:
@@ -210,7 +212,7 @@ i.e. they don't take into account "start" & "stop" parameters.
 }
 ```
 
-If you set up your credentials file already, there is a helper class `MediumConfigHelper`,
+> If you set up your credentials file already, there is a helper class `MediumConfigHelper`,
 that wraps the standard `configparser`:
 ```python
 import os
