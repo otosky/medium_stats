@@ -194,6 +194,16 @@ class StatGrabber:
         r = self.session.post(gql_endpoint, json=post_data)
         
         return r.json()
+    
+    def get_all_story_stats(self, post_ids, type_='view_read'):
+
+        container = {'data': {'post': []}}
+
+        for post in post_ids:
+            data = self.get_story_stats(post, type_=type_)
+            container['data']['post'] += [data['data']['post']]
+        
+        return container
 
     def write_json(self, data, filepath):
 
