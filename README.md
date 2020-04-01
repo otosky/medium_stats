@@ -8,7 +8,7 @@ the data as it is pre-rendered.*
 
 ## Install
 
-```
+```bash
 $ pip install medium_stats
 ```
 
@@ -32,7 +32,7 @@ needs **two** cookies from a signed-in Medium session - "sid" and "uid".
 
 Create a `.medium_creds.ini` file to hold these cookie values:
 
-```
+```bash
 cat > path_to_directory/.medium_creds.ini << EOF
 [MEDIUM]
 sid=insert_sid_value_here
@@ -46,7 +46,7 @@ EOF
 
 *If you want to automatically find and store your cookies:*
 
-```
+```bash
 $ pip install medium_stats[selenium]
 ```
 
@@ -56,7 +56,7 @@ Chrome installed.
 
 Currently only valid for Gmail OAuth:
 
-```
+```bash
 $ medium-stats fetch-cookies --email [EMAIL] --pwd [PASSWORD]
 
 # Or specify that your password should be pulled from an environment variable:
@@ -69,7 +69,7 @@ $ medium-stats fetch-cookies --email [EMAIL] --pwd-in-env
 Create a directory for your stats exports [optional]; the CLI tool will run 
 under the working directory by default.
 
-```
+```bash
 $ mkdir path_to_target_stats_directory
 ```
 
@@ -88,14 +88,14 @@ target_stats_directory/
 
 Simple Use: 
 
-```
+```bash
 $ medium-stats scrape -u [USERNAME] --all
 ```
 
 > This will get all Medium stats until now. 
 
 General Use pattern:
-```
+```bash
 medium-stats scrape -u USERNAME [--output_dir DIR] (--creds PATH | (--sid SID --uid UID)) \
 (--all | [--start PERIOD_START] [--end PERIOD END]) [--mode {summary, events, articles, referrers}]
 ```
@@ -118,7 +118,7 @@ Basic Usage:
 ```python
 from medium_stats.scraper import StatGrabber
 
-# get aggregated summary statistics; NOTE: "start" & "stop" params also accept datetime objects
+# get aggregated summary statistics; "start" & "stop" params also accept datetime objects
 me = StatGrabber('your_medium_username', sid='sid', uid='uid', start='2020-03-01', stop='2020-04-01')
 data = me.get_summary_stats()
 
@@ -215,7 +215,9 @@ that wraps the standard `configparser`:
 ```python
 import os
 from medium_stats.cli import MediumConfigHelper
+
 default_creds = os.path.join(os.path.expanduser('~'), '.medium_creds.ini')
+
 cookies = MediumConfigHelper(default_creds)
 sid = cookies.sid
 uid = cookies.uid
