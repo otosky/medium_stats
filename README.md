@@ -121,7 +121,7 @@ Basic Usage:
 from medium_stats.scraper import StatGrabber
 
 # get aggregated summary statistics; "start" & "stop" params also accept datetime objects
-me = StatGrabber('your_medium_username', sid='sid', uid='uid', start='2020-03-01', stop='2020-04-01')
+me = StatGrabber('username', sid='sid', uid='uid', start='2020-03-01', stop='2020-04-01')
 data = me.get_summary_stats()
 
 # get the unattributed event logs for all your stories:
@@ -130,14 +130,8 @@ data_events = me.get_summary_stats(events=True)
 # get individual article statistics
 articles = me.get_article_ids(data) # returns a list of article_ids
 
-posts = {'data': {'post': []}}
-referrers = {'data': {'post': []}}
-for article in articles:
-    post_views = me.get_story_stats(article)
-    posts['data']['post'] += list(post_views['data']['post'])
-    
-    refs = me.get_story_stats(article, type='referrers')
-    referrers['data']['post'] += list(refs['data']['post'])
+article_events = me.get_all_story_stats(articles) # daily event logs
+referrers = me.get_all_story_stats(articles, type='referrers') # all-time referral sources
 ```
 
 Note: "summary_stats" and "referrer" data pre-aggregates to your full history, 
