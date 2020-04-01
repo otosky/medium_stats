@@ -139,7 +139,7 @@ i.e. they don't take into account "start" & "stop" parameters.
 
 #### Example output:
 `data` (summary):
-```json
+```
 [   {   'claps': 3,
         'collectionId': '',
         'createdAt': 1570229100438,
@@ -167,7 +167,7 @@ i.e. they don't take into account "start" & "stop" parameters.
 ```
 
 `data_events`:
-```json
+```
 [{  'claps': 0,
     'flaggedSpam': 0,
     'reads': 0,
@@ -180,7 +180,7 @@ i.e. they don't take into account "start" & "stop" parameters.
 ```
 
 `article_events`:
-```json
+```
 {'data': {
     'post': [{
         '__typename': 'Post',
@@ -207,7 +207,7 @@ i.e. they don't take into account "start" & "stop" parameters.
 ```
 
 `referrers`:
-```json
+```
 {'data': {'post': [{'__typename': 'Post',
                     'id': 'POST_ID',
                     'referrers': [{'__typename': 'Referrer',
