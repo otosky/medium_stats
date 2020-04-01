@@ -79,10 +79,10 @@ Once executed the CLI tool will create the following directory structure:
 ```
 target_stats_directory/
     stats_exports/
-        agg_stats 
-        agg_events 
-        post_events
-        post_referrers
+        agg_stats/ 
+        agg_events/ 
+        post_events/
+        post_referrers/
 ```
 
 ## Usage
