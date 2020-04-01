@@ -4,7 +4,7 @@ A command-line tool and Python package to fetch your Medium profile statistics
 and save the data as JSON.
 
 *Executes the same API and Graphql requests as the Medium front-end does, providing 
-you with the data as it is pre-rendered.*
+you with the data as it is, pre-rendered.*
 
 ## Install
 
