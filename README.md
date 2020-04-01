@@ -131,7 +131,7 @@ data_events = me.get_summary_stats(events=True)
 articles = me.get_article_ids(data) # returns a list of article_ids
 
 article_events = me.get_all_story_stats(articles) # daily event logs
-referrers = me.get_all_story_stats(articles, type='referrers') # all-time referral sources
+referrers = me.get_all_story_stats(articles, type_='referrer') # all-time referral sources
 ```
 
 Note: "summary_stats" and "referrer" data pre-aggregates to your full history, 
@@ -203,6 +203,40 @@ i.e. they don't take into account "start" & "stop" parameters.
         'id': 'ARTICLE_ID'},
         ...
     ]}
+}
+```
+
+`referrers` or "--mode referrers":
+```
+{'data': {'post': [{'__typename': 'Post',
+                    'id': 'POST_ID',
+                    'referrers': [{'__typename': 'Referrer',
+                                   'internal': None,
+                                   'platform': None,
+                                   'postId': 'POST_ID',
+                                   'search': None,
+                                   'site': None,
+                                   'sourceIdentifier': 'direct',
+                                   'totalCount': 222,
+                                   'type': 'DIRECT'},
+                                  ...
+                                  {'__typename': 'Referrer',
+                                   'internal': None,
+                                   'platform': None,
+                                   'postId': 'POST_ID',
+                                   'search': None,
+                                   'site': {'__typename': 'SiteReferrer',
+                                            'href': 'https://www.inoreader.com/',
+                                            'title': None},
+                                   'sourceIdentifier': 'inoreader.com',
+                                   'totalCount': 1,
+                                   'type': 'SITE'}],
+                    'title': 'TITLE_HERE',
+                    'totalStats': {'__typename': 'SummaryPostStat',
+                                   'views': 395}},
+                    ...
+                   ]
+            }
 }
 ```
 
