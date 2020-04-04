@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='medium-stats',
-    version='1.0.1',
+    version='2.0.0',
     entry_points={
         'console_scripts': [
             'medium-stats = medium_stats.__main__:main'
