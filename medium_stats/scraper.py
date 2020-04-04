@@ -3,11 +3,9 @@ import configparser
 import requests, json
 import re, os
 import traceback
-from medium_stats.utils import ensure_date_valid
+from medium_stats.utils import ensure_date_valid, convert_datetime_to_unix
 from requests.exceptions import HTTPError
-
-DEFAULT_END = datetime.utcnow()
-DEFAULT_START = DEFAULT_END - timedelta(days=30)
+from lxml import html
 
 stats_post_chart_q = '''\
     query StatsPostChart($postId: ID!, $startAt: Long!, $endAt: Long!) {
@@ -98,31 +96,20 @@ stats_post_ref_q = '''\
     }
 '''
 
-class StatGrabber:
+class StatGrabberBase:
 
-    def __init__(self, username, sid, uid, start, stop):
+    def __init__(self, sid, uid, start, stop, now=None):
 
-        self.username = str(username)
         self.start, self.stop = map(ensure_date_valid, (start, stop))
-        self.start_unix, self.stop_unix = map(StatGrabber._convert_datetime_to_unix, (start, stop))
-        self.stats_url = f'https://medium.com/@{username}/stats?filter=not-response'
-        self.totals_endpoint = f'https://medium.com/@{username}/stats/total/{self.start_unix}/{self.stop_unix}'
+        self.start_unix, self.stop_unix = map(convert_datetime_to_unix, (start, stop))
         self.sid = sid
         self.uid = uid
         self.cookies = {'sid': sid, 'uid': uid}
         self._setup_requests()
-        self.now = datetime.utcnow()
-
-    @staticmethod
-    def _convert_datetime_to_unix(dt, ms=True):
-        
-        dt = ensure_date_valid(dt)
-        dt  = int(dt.timestamp())
-        
-        if ms:
-            dt = dt * 1000
-        
-        return dt
+        if not now:
+            self.now = datetime.utcnow()
+        else:
+            self.now = now
 
     def _setup_requests(self):
         
@@ -139,29 +126,19 @@ class StatGrabber:
         response.raise_for_status()
         return response
 
-    def get_summary_stats(self, events=False):
+    def _decode_json(self, response):
+
+        cleaned = response.text.replace('])}while(1);</x>', '')
+        return json.loads(cleaned)['payload']
+
+    def _find_data_in_html(self, response):
+
+        etree = html.fromstring(response)
+        refs = etree.xpath('//script[contains(text(), "references")]')[0]
+        refs = refs.replace('// <![CDATA[\nwindow["obvInit"](', '')
+        refs = refs.replace(')\n// ]]>', '')
         
-        json_cleaner = lambda x: x.text.replace('])}while(1);</x>', '')
-        json_loader = lambda x: json.loads(x)['payload']
-
-        if events:
-            response = self._fetch(self.totals_endpoint)
-        else:
-            response = self._fetch(self.stats_url)
-
-        data = json_cleaner(response)
-        data = json_loader(data)
-        
-        # reset period "start" to when user created Medium account, if init 
-        # setting is prior 
-        if not events:
-            user_creation = data['references']['User'][self.uid]['createdAt']
-            user_creation = datetime.fromtimestamp(user_creation / 1e3)
-            if self.start < user_creation:
-                self.start = user_creation
-                self.start_unix = StatGrabber._convert_datetime_to_unix(self.start)
-
-        return data['value']
+        return json.loads(refs)
 
     def get_article_ids(self, summary_stats_json):
 
@@ -219,3 +196,94 @@ class StatGrabber:
             f.write(data)
 
         return filepath
+
+class StatGrabberUser(StatGrabberBase):
+
+    def __init__(self, username, sid, uid, start, stop, now=None):
+      
+      self.username = str(username)
+      super().__init__(sid, uid, start, stop, now)
+      self.stats_url = f'https://medium.com/@{username}/stats?filter=not-response'
+      self.totals_endpoint = f'https://medium.com/@{username}/stats/total/{self.start_unix}/{self.stop_unix}'
+      
+    def get_summary_stats(self, events=False):
+          
+        #json_cleaner = lambda x: x.text.replace('])}while(1);</x>', '')
+        #json_loader = lambda x: json.loads(x)['payload']
+
+        if events:
+            response = self._fetch(self.totals_endpoint)
+        else:
+            response = self._fetch(self.stats_url)
+
+        # data = json_cleaner(response)
+        # data = json_loader(data)
+        data = self._decode_json(response)
+        
+        # reset period "start" to when user created Medium account, if init 
+        # setting is prior 
+        if not events:
+            user_creation = data['references']['User'][self.uid]['createdAt']
+            user_creation = datetime.fromtimestamp(user_creation / 1e3)
+            if self.start < user_creation:
+                self.start = user_creation
+                self.start_unix = convert_datetime_to_unix(self.start)
+
+        return data['value']
+
+class StatGrabberPublication(StatGrabberBase):
+
+    def __init__(self, url, sid, uid, start, stop, now=None):
+
+        self.url = url
+        super().__init__(sid, uid, start, stop, now)
+        homepage = self._fetch(self.url)
+        # TODO figure out why requests lib doesn't get full html from this url
+        data = self._decode_json(homepage)
+        self.attrs_json = data['collection']
+        self._unpack_attrs(self.attrs_json)
+        
+        collections_endpoint = f'https://medium.com/_/api/collections/{self.id}/stats/'
+        timeframe = f'?from={self.start_unix}&to={self.stop_unix}'
+        create_endpoint = lambda x: collections_endpoint + x + timeframe
+        self.views_endpoint = create_endpoint('views')
+        self.visitors_endpoint = create_endpoint('visitors')
+
+    def _unpack_attrs(self, attrs_json):
+
+        self.id = self.attrs_json['id']
+        self.slug = self.attrs_json['slug']
+        self.name = self.attrs_json['name']
+        self.creator = self.attrs_json['creatorId']
+        self.description = self.attrs_json['description']
+        self.domain = self.attrs_json['domain']
+        creation = self.attrs_json['metadata']['activeAt']
+        creation = datetime.fromtimestamp(creation / 1e3)
+        if self.start < creation:
+          self.start = creation
+          self.start_unix = convert_datetime_to_unix(self.start)
+
+    def __repr__(self):
+        return f'{self.name} - {self.description}'
+
+    def get_events(self, type_='views'):
+      
+        if type_ == 'views':
+            response = self._fetch(self.views_endpoint)
+        elif type_ == 'visitors':
+            response = self._fetch(self.visitors_endpoint)
+        # TODO: add error message for "type_" not allowed
+        else:
+            raise ValueError
+        
+        data = self._decode_json(response)
+
+        return data['value']
+
+    def get_stories_overview(self):
+        
+        endpoint = f'https://medium.com/{self.slug}/stats/stories'
+        response = self._fetch(endpoint)
+        data = self._decode_json(response)
+        
+        return data['value']

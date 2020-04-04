@@ -40,3 +40,13 @@ def dt_formatter(dt, output):
         dt = dt.strftime('%Y%m%dT%H%M%S')
         
     return dt    
+
+def convert_datetime_to_unix(dt, ms=True):
+        
+    dt = ensure_date_valid(dt)
+    dt  = int(dt.timestamp())
+    
+    if ms:
+        dt = dt * 1000
+    
+    return dt

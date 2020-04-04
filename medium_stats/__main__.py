@@ -3,7 +3,7 @@ import argparse, configparser
 from datetime import datetime, timedelta
 from functools import partial
 import os, re
-from medium_stats.scraper import StatGrabber
+from medium_stats.scraper import StatGrabberUser, StatGrabberPublication
 from medium_stats.cli import create_directories, get_argparser, parse_scraper_args
 from medium_stats.utils import dt_formatter
 from medium_stats.cli import MediumConfigHelper
@@ -159,7 +159,7 @@ def main():
             start = args.start
 
         cfg = MediumConfigHelper(config_path)
-        me = StatGrabber(username, cfg.sid, cfg.uid, start, end)
+        me = StatGrabberUser(username, cfg.sid, cfg.uid, start, end)
 
         print('\nGetting Preliminary Data...', end='\n\n')
         # get summary stats to derive article_ids and user creation_time
