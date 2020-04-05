@@ -208,7 +208,7 @@ class StatGrabberUser(StatGrabberBase):
       self.totals_endpoint = f'https://medium.com/@{username}/stats/total/{self.start_unix}/{self.stop_unix}'
     
     def __repr__(self):
-        return f'{self.username} - uid: {self.uid}'
+        return f'username: {self.username} // uid: {self.uid}'
 
     def get_summary_stats(self, events=False):
 
@@ -273,7 +273,7 @@ class StatGrabberPublication(StatGrabberBase):
             response = self._fetch(self.visitors_endpoint)
         # TODO: add error message for "type_" not allowed
         else:
-            raise ValueError
+            raise ValueError('"type_" param must be either "views" or "visitors"')
         
         data = self._decode_json(response)
 
