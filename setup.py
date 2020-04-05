@@ -26,5 +26,6 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     keywords="Medium blog scraper analytics",
-    license='GNU GPLv3'
+    license='GNU GPLv3',
+    url='https://github.com/otosky/medium_stats'
 )
