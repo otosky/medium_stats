@@ -16,7 +16,7 @@ setup(
         ]
     },
     packages=find_packages(exclude=("tests",)),
-    install_requires = ['requests'],
+    install_requires = ['requests', 'lxml'],
     extras_require={
         'selenium': ['selenium', 'webdriver_manager']
     },
