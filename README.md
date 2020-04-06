@@ -132,6 +132,13 @@ articles = me.get_article_ids(data) # returns a list of article_ids
 
 article_events = me.get_all_story_stats(articles) # daily event logs
 referrers = me.get_all_story_stats(articles, type_='referrer') # all-time referral sources
+
+pub = StatGrabberPublication(url, cfg.sid, cfg.uid, start, end)
+views = pub.get_events(type_='views')
+visitors = pub.get_events(type_='visitors')
+stories = pub.get_all_story_overview()
+articles = pub.get_article_ids(stories)
+data = pub.get_all_story_stats(articles)
 ```
 
 Note: "summary_stats" and "referrer" data pre-aggregates to your full history, 

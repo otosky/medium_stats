@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import argparse
 from importlib.util import find_spec
@@ -44,6 +44,7 @@ def dt_formatter(dt, output):
 def convert_datetime_to_unix(dt, ms=True):
         
     dt = ensure_date_valid(dt)
+    dt = dt.replace(tzinfo=timezone.utc)
     dt  = int(dt.timestamp())
     
     if ms:

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import configparser
 import requests, json
 import re, os
@@ -202,6 +202,7 @@ class StatGrabberUser(StatGrabberBase):
     def __init__(self, username, sid, uid, start, stop, now=None):
       
       self.username = str(username)
+      self.slug = str(username)
       super().__init__(sid, uid, start, stop, now)
       # TODO: find a test User with many more posts to see how to deal with pagination
       self.stats_url = f'https://medium.com/@{username}/stats?filter=not-response&limit=50'
@@ -223,7 +224,7 @@ class StatGrabberUser(StatGrabberBase):
         # setting is prior 
         if not events:
             user_creation = data['references']['User'][self.uid]['createdAt']
-            user_creation = datetime.fromtimestamp(user_creation / 1e3)
+            user_creation = datetime.fromtimestamp(user_creation / 1e3, timezone.utc)
             if self.start < user_creation:
                 self.start = user_creation
                 self.start_unix = convert_datetime_to_unix(self.start)
@@ -255,12 +256,17 @@ class StatGrabberPublication(StatGrabberBase):
         self.name = self.attrs_json['name']
         self.creator = self.attrs_json['creatorId']
         self.description = self.attrs_json['description']
-        self.domain = self.attrs_json['domain']
+        try:
+            self.domain = self.attrs_json['domain']
+        except:
+            self.domain = None
         creation = self.attrs_json['metadata']['activeAt']
-        creation = datetime.fromtimestamp(creation / 1e3)
-        if self.start < creation:
-          self.start = creation
-          self.start_unix = convert_datetime_to_unix(self.start)
+        print('creation_time', creation)
+        creation = datetime.fromtimestamp(creation / 1e3, timezone.utc)
+        print('creation_time', creation)
+        # if self.start < creation:
+        #     self.start = creation
+        #     self.start_unix = convert_datetime_to_unix(self.start)
 
     def __repr__(self):
         return f'{self.name} - {self.description}'

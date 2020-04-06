@@ -10,56 +10,79 @@ from medium_stats.cli import MediumConfigHelper
 
 section_break = '\n{0}\n'.format('+' * 30)
 
-mode_attrs = {
-    'summary': {
-        'title': 'Aggregated Summary Stats',
-        'type': 'aggStats',
-        'folder': 'agg_stats',
-        'filename_suffix': 'summary_stats.json'
-    },
-    'events': {
-        'title': 'Summary Event Logs',
-        'type': 'aggEvents',
-        'folder': 'agg_events',
-        'filename_suffix': 'summary_events.json'
-    },
+common_mode_attrs = {
     'articles': {
         'title': 'Article Event Logs',
         'type': 'postEvents',
         'folder': 'post_events',
-        'filename_suffix': 'post_events.json'
+        'filename_suffix': 'post_events.json',
+        'is_aggregated': False
     },
     'referrers': {
         'title': 'Referrer Data',
         'type': 'referrers',
         'folder': 'post_referrers',
-        'filename_suffix': 'post_referrers.json'
+        'filename_suffix': 'post_referrers.json',
+        'is_aggregated': True
     }
 }
 
+user_mode_attrs = {
+    'summary': {
+        'title': 'Aggregated Summary Stats',
+        'type': 'aggStats',
+        'folder': 'agg_stats',
+        'filename_suffix': 'summary_stats.json',
+        'is_aggregated': True
+    },
+    'events': {
+        'title': 'Summary Event Logs',
+        'type': 'aggEvents',
+        'folder': 'agg_events',
+        'filename_suffix': 'summary_events.json',
+        'is_aggregated': False
+    }
+}
+user_mode_attrs = {**user_mode_attrs, **common_mode_attrs}
+
+pub_mode_attrs = {
+    'events': {
+        'title': 'Views & Visitors Event Logs',
+        'type': 'pubEvents',
+        'folder': 'agg_events',
+        'filename_suffix': 'summary_events.json',
+        'is_aggregated': False
+    },
+    'story_overview': {
+        'title': 'Stories Overview',
+        'type': 'storiesOverview',
+        'folder': 'stories_summary',
+        'filename_suffix': 'stories_summary.json',
+        'is_aggregated': True
+    }
+}
+pub_mode_attrs = {**pub_mode_attrs, **common_mode_attrs}
+
+def get_extra_attrs(sg, mode):
+
+    if isinstance(sg, StatGrabberUser):
+        extras = user_mode_attrs[mode]
+    elif isinstance(sg, StatGrabberPublication):
+        extras = pub_mode_attrs[mode]
+    
+    return extras
+
 def get_stats(sg, mode, now, articles=None):
 
-    extras = mode_attrs[mode]
+    extras = get_extra_attrs(sg, mode)
+    
     now_json = dt_formatter(now, 'json')
     
     if mode in ['events', 'articles']:
         period_start, period_stop = map(partial(dt_formatter, output='json'), 
                                         [sg.start, sg.stop])
-    
-    def template_data(mode):
-
-        if mode in ['summary', 'referrers']:
-            dict_ = {
-                'timestamp': now_json,
-                'type': extras['type']
-            }
-        elif mode in ['articles', 'events']:
-            dict_ = {
-                'periodBegin': period_start,
-                'periodEnd': period_stop,
-                'type': extras['type']
-            }
-        return dict_
+     # TODO - add if-statement to make sure that modes that need articles have articles passed in as arg
+     # if mode in ['articles', 'referrals'] and not articles: raise someError
 
     print(f'\nGetting {extras["title"]}...', end='\n\n')
 
@@ -69,10 +92,20 @@ def get_stats(sg, mode, now, articles=None):
     
         data = {'data': {'post': agg_stats}}
     elif mode == 'events':
-        non_attrib_events = sg.get_summary_stats(events=True)
+        
+        if isinstance(sg, StatGrabberUser):
+            non_attrib_events = sg.get_summary_stats(events=True)
+            data = {'data': {'events': non_attrib_events}}
+        elif isinstance(sg, StatGrabberPublication):
+            views = sg.get_events(type_='views')
+            visitors = sg.get_events(type_='visitors')
+            data = {'data': {'views': views, 'visitors': visitors}}
 
-        data = {'data': {'events': non_attrib_events}}
+    elif mode == 'story_overview':
 
+        stories = sg.get_all_story_overview()
+        data = {'data': {'story': stories}}
+    
     elif mode == 'articles':
         
         data = sg.get_all_story_stats(articles)
@@ -80,27 +113,38 @@ def get_stats(sg, mode, now, articles=None):
     elif mode == 'referrers':
         
         data = sg.get_all_story_stats(articles, type_='referrer')
-        
-    else:
-        raise ValueError('"mode" param must be of choice {summary, events, articles, referrers}')
     
-    extras = template_data(mode)
+    else:
+        # TODO remove hardcoding from this message - make choice list dynamic from keys
+        raise ValueError('"mode" param must be of choice {summary, events, story_overview, articles, referrers}')
+    
+    if extras['is_aggregated']:
+        extras = {
+                'timestamp': now_json,
+                'type': extras['type']
+            }
+    else:
+        extras = {
+                'periodBegin': period_start,
+                'periodEnd': period_stop,
+                'type': extras['type']
+            }
     
     return {**data, **extras}
 
 def write_stats(sg, data, mode, now, sub_dir):
 
-    extras = mode_attrs[mode]
+    extras = get_extra_attrs(sg, mode)
     now_prefix = dt_formatter(now, 'filename')
     period_start_f, period_stop_f = map(partial(dt_formatter, output='filename'), 
                                         [sg.start, sg.stop])
     
-    filename = '{}/{}/{}_{}'.format(sub_dir, extras['folder'], 
-                                    now_prefix, extras['filename_suffix'])
+    filename = '{}/{}/{}_{}_{}'.format(sub_dir, extras['folder'], 
+                                    now_prefix, sg.slug, extras['filename_suffix'])
     if mode in ['events', 'articles']:
-        filename = '{}/{}/{}_{}_{}'.format(sub_dir, extras['folder'], 
+        filename = '{}/{}/{}_{}_{}_{}'.format(sub_dir, extras['folder'], 
                                            period_stop_f, period_start_f,
-                                           extras['filename_suffix'])
+                                           sg.slug, extras['filename_suffix'])
     path = sg.write_json(data, filename)
     print(f'{extras["title"]} written to:')
     print(path, section_break, sep='\n')
@@ -124,9 +168,6 @@ def main():
     args = parser.parse_args()
     
     # TODO - make this a plain path; not a directory argument
-    config_path = re.sub('\/$', '', args.creds)
-    if not config_path:
-        config_path = os.path.join(os.path.expanduser('~'), '.medium_creds.ini')
     
     command = args.command
 
@@ -138,18 +179,17 @@ def main():
         
         me = MediumAuthorizer(email, password)
         me.sign_in()
-        me.save_cookies(config_path)
+        me.save_cookies(args.creds)
         print(section_break)
     
-    elif command == 'scrape':
+    elif command in ['scrape_user', 'scrape_publication']:
         args = parse_scraper_args(args, parser)
-        username = args.u
-
-        root_dir = args.output_dir
-        if not root_dir:
-            root_dir = os.getcwd()
-
-        sub_dir = create_directories(root_dir)
+        
+        if args.creds:
+            cfg = MediumConfigHelper(args.creds)
+            sid, uid = cfg.sid, cfg.uid
+        else:
+            sid, uid = args.sid, args.uid
 
         if args.all:
             end = datetime.utcnow()
@@ -158,26 +198,42 @@ def main():
             end = args.end
             start = args.start
 
-        cfg = MediumConfigHelper(config_path)
-        me = StatGrabberUser(username, cfg.sid, cfg.uid, start, end)
+        modes = list(args.mode)
+
+        get_folders = lambda x: [x[m]['folder'] for m in modes]
 
         print('\nGetting Preliminary Data...', end='\n\n')
-        # get summary stats to derive article_ids and user creation_time
-        data = me.get_summary_stats()
-        articles = me.get_article_ids(data)
-        if 'summary' in args.mode:
-            write_stats(me, data, 'summary', me.now, sub_dir)
-        
-        mode = list(args.mode)
+        if command == 'scrape_user':
+            username = args.u
+            sg = StatGrabberUser(username, sid, uid, start, end)
+            folders = get_folders(user_mode_attrs)
+            sub_dir = create_directories(args.output_dir, sg.slug, folders)
+            
+            # get summary stats to derive article_ids and user creation_time
+            data = sg.get_summary_stats()
+            articles = sg.get_article_ids(data)
+            if 'summary' in modes:
+                write_stats(sg, data, 'summary', sg.now, sub_dir)
+            
+        else:
+            url = args.u
+            sg = StatGrabberPublication(url, sid, uid, start, end)
+            folders = get_folders(pub_mode_attrs)
+            sub_dir = create_directories(args.output_dir, sg.slug, folders)
+            data = sg.get_all_story_overview()
+            articles = sg.get_article_ids(data)
+            if 'story_overview' in modes:
+                write_stats(sg, data, 'story_overview', sg.now, sub_dir)
+
         # go through remainder of modes
-        remaining = [m for m in mode if m != 'summary']
+        remaining = [m for m in modes if m not in ('summary', 'story_overview')]
         for m in remaining:
             if m == 'events':
-                data = get_stats(me, m, me.now)
+                data = get_stats(sg, m, sg.now)
             else:
-                data = get_stats(me, m, me.now, articles)
-            write_stats(me, data, m, me.now, sub_dir)
-    
+                data = get_stats(sg, m, sg.now, articles)
+            write_stats(sg, data, m, sg.now, sub_dir)
+
     print('All done!')
 
 if __name__=="__main__":

@@ -4,7 +4,9 @@ import argparse
 import configparser
 from inspect import cleandoc
 
-MODE_CHOICES = ['summary', 'events', 'articles', 'referrers']
+# TODO add mode_choices for publication
+USER_MODE_CHOICES = ['summary', 'events', 'articles', 'referrers']
+PUB_MODE_CHOICES = ['events', 'story_overview', 'articles', 'referrers']
 
 def valid_date(string):
     if len(string) > 10:
@@ -28,20 +30,37 @@ def valid_path(path):
         raise argparse.ArgumentTypeError(msg)
     return path
 
-def create_directories(root_dir):
+def create_directories(root_dir, handle, folders):
 
-    sub_dir = f'{root_dir}/stats_exports'
+    sub_dir = f'{root_dir}/stats_exports/{handle}'
     if not os.path.exists(sub_dir):
         os.chdir(root_dir)
-        os.makedirs('stats_exports')
-        folders = ['agg_stats', 'agg_events', 'post_events', 'post_referrers']
+        # TODO add mkdir for handle, i.e. slug
+        #os.makedirs(f'stats_exports/{handle}')
+        # TODO folder names passed in from dict keys
+        #folders = ['agg_stats', 'agg_events', 'post_events', 'post_referrers']
         for f in folders:
             dir_ = '{0}/{1}'.format(sub_dir, f)
+            # only make folder if doesn't already exist
             os.makedirs(dir_)
     
     return sub_dir
 
 def get_argparser():
+
+    def add_subarguments(parser):
+        
+        parser.add_argument('--output_dir', type=valid_path, metavar='PATH', default=os.getcwd(), help='output file directory')
+        creds_group = parser.add_argument_group('creds')
+        creds_group.add_argument('--creds', default=default_creds, help='creds.ini file path with "sid" and "uid" values')
+        creds_group.add_argument('--sid', help='Medium session "sid" cookie value; REQUIRED if "--creds" path not supplied')
+        creds_group.add_argument('--uid', help='your Medium "uid" cookie value; REQUIRED if "--creds" path not supplied')
+
+        period_group = parser.add_argument_group('period')
+        period_group.add_argument('--all', action='store_true', help='full history since your first publication')
+        period_group.add_argument('--start', type=valid_date, help='stats start date, format=YYYY-MM-DD')
+        period_group.add_argument('--end', type=valid_date, help='stats end date, format=YYYY-MM-DD')
+
     cli_parser = argparse.ArgumentParser()
     subparser = cli_parser.add_subparsers(title='commands', dest='command')
     default_creds = os.path.join(os.path.expanduser('~'), '.medium_creds.ini')
@@ -56,31 +75,50 @@ def get_argparser():
     pwd_group.add_argument('--pwd-in-env', action='store_true', help="pulls Medium password from environment variable")
     cf.add_argument('--creds', default=default_creds, help='creds.ini file path with "sid" and "uid" values')
 
-    # scraper
+
+    # USER
     usage = '''\
-    medium-stats scrape -u USERNAME [--output_dir DIR] \
+    medium-stats scrape_user -u USERNAME [--output_dir DIR] \
     (--creds PATH | (--sid SID --uid UID)) \
     (--all | [--start PERIOD_START] [--end PERIOD END]) \
     [--mode {summary, events, articles, referrers}]'''
     usage = usage.replace('    ', '')
 
-    scrape = subparser.add_parser('scrape', usage=usage, help='get statistics')
-    scrape.add_argument('-u', metavar='USERNAME', help='your Medium username')
-    scrape.add_argument('--output_dir', type=valid_path, metavar='PATH', default=os.getcwd(), help='output file directory')
-    creds_group = scrape.add_argument_group('creds')
-    creds_group.add_argument('--creds', default=default_creds, help='creds.ini file path with "sid" and "uid" values')
-    creds_group.add_argument('--sid', help='Medium session "sid" cookie value; REQUIRED if "--creds" path not supplied')
-    creds_group.add_argument('--uid', help='your Medium "uid" cookie value; REQUIRED if "--creds" path not supplied')
+    scrape_user = subparser.add_parser('scrape_user', usage=usage, help='get user statistics')
+    scrape_user.add_argument('-u', metavar='USERNAME', help='your Medium username')
+    # scrape.add_argument('--output_dir', type=valid_path, metavar='PATH', default=os.getcwd(), help='output file directory')
+    # creds_group = scrape.add_argument_group('creds')
+    # creds_group.add_argument('--creds', default=default_creds, help='creds.ini file path with "sid" and "uid" values')
+    # creds_group.add_argument('--sid', help='Medium session "sid" cookie value; REQUIRED if "--creds" path not supplied')
+    # creds_group.add_argument('--uid', help='your Medium "uid" cookie value; REQUIRED if "--creds" path not supplied')
 
-    period_group = scrape.add_argument_group('period')
-    period_group.add_argument('--all', action='store_true', help='full history since your first publication')
-    period_group.add_argument('--start', type=valid_date, help='stats start date, format=YYYY-MM-DD')
-    period_group.add_argument('--end', type=valid_date, help='stats end date, format=YYYY-MM-DD')
+    # period_group = scrape.add_argument_group('period')
+    # period_group.add_argument('--all', action='store_true', help='full history since your first publication')
+    # period_group.add_argument('--start', type=valid_date, help='stats start date, format=YYYY-MM-DD')
+    # period_group.add_argument('--end', type=valid_date, help='stats end date, format=YYYY-MM-DD')
 
-    scrape.add_argument('--mode', nargs='*', 
-                        choices=MODE_CHOICES, default=MODE_CHOICES, 
+    add_subarguments(scrape_user)
+    scrape_user.add_argument('--mode', nargs='*', 
+                        choices=USER_MODE_CHOICES, default=USER_MODE_CHOICES, 
                         help='limit retrieval to particular statistics; defaults to all modes')
     
+    # PUBLICATION
+    usage = '''\
+    medium-stats scrape_publication -u URL [--output_dir DIR] \
+    (--creds PATH | (--sid SID --uid UID)) \
+    (--all | [--start PERIOD_START] [--end PERIOD END]) \
+    [--mode {events, story_overview, articles, referrers}]'''
+    usage = usage.replace('    ', '')
+
+    scrape_pub = subparser.add_parser('scrape_publication', usage=usage, help='get publication statistics')
+    # TODO - change help below
+    scrape_pub.add_argument('-u', metavar='URL', help='publication URL')
+    add_subarguments(scrape_pub)
+    # TODO -change args below
+    scrape_pub.add_argument('--mode', nargs='*', 
+                        choices=PUB_MODE_CHOICES, default=PUB_MODE_CHOICES, 
+                        help='limit retrieval to particular statistics; defaults to all modes')
+
     return cli_parser
 
 def parse_scraper_args(args, parser):
@@ -89,8 +127,9 @@ def parse_scraper_args(args, parser):
     if cookies_supplied and not bool(args.sid and args.uid):
         parser.error('Need both "sid" and "uid" arguments together.')
     
-    if args.creds and cookies_supplied:
-        parser.error('Set creds via "creds" path or "sid" and "uid" arguments. Not both.')
+    if cookies_supplied:
+        args.creds=None
+    # TODO add a check to see if args.creds is path or directory
 
     if not bool(args.all or args.start or args.end):
         parser.error('Period must be set as "--all" or a range with "--start" and/or "--stop" values')
