@@ -3,9 +3,10 @@ import configparser
 import requests, json
 import re, os
 import traceback
-from medium_stats.utils import ensure_date_valid, convert_datetime_to_unix
+from medium_stats.utils import make_utc_explicit, convert_datetime_to_unix
 from requests.exceptions import HTTPError
 from lxml import html
+from functools import partial
 
 stats_post_chart_q = '''\
     query StatsPostChart($postId: ID!, $startAt: Long!, $endAt: Long!) {
@@ -98,16 +99,22 @@ stats_post_ref_q = '''\
 
 class StatGrabberBase:
 
-    def __init__(self, sid, uid, start, stop, now=None):
+    def __init__(self, sid, uid, start, stop, now=None, already_utc=False):
 
-        self.start, self.stop = map(ensure_date_valid, (start, stop))
+        for s in [start, stop]:
+            if not isinstance(s, datetime):
+                msg = f'argument "{s}" must be of type datetime.datetime'
+                raise TypeError(msg)
+
+        make_utc = partial(make_utc_explicit, utc_naive=already_utc)
+        self.start, self.stop = map(make_utc, (start, stop))
         self.start_unix, self.stop_unix = map(convert_datetime_to_unix, (start, stop))
         self.sid = sid
         self.uid = uid
         self.cookies = {'sid': sid, 'uid': uid}
         self._setup_requests()
         if not now:
-            self.now = datetime.utcnow()
+            self.now = datetime.now(timezone.utc)
         else:
             self.now = now
 
@@ -199,11 +206,11 @@ class StatGrabberBase:
 
 class StatGrabberUser(StatGrabberBase):
 
-    def __init__(self, username, sid, uid, start, stop, now=None):
+    def __init__(self, username, sid, uid, start, stop, now=None, already_utc=False):
       
       self.username = str(username)
       self.slug = str(username)
-      super().__init__(sid, uid, start, stop, now)
+      super().__init__(sid, uid, start, stop, now, already_utc)
       # TODO: find a test User with many more posts to see how to deal with pagination
       self.stats_url = f'https://medium.com/@{username}/stats?filter=not-response&limit=50'
       self.totals_endpoint = f'https://medium.com/@{username}/stats/total/{self.start_unix}/{self.stop_unix}'
@@ -233,10 +240,10 @@ class StatGrabberUser(StatGrabberBase):
 
 class StatGrabberPublication(StatGrabberBase):
 
-    def __init__(self, url, sid, uid, start, stop, now=None):
+    def __init__(self, url, sid, uid, start, stop, now=None, already_utc=False):
 
         self.url = url
-        super().__init__(sid, uid, start, stop, now)
+        super().__init__(sid, uid, start, stop, now, already_utc)
         homepage = self._fetch(self.url)
         # TODO figure out why requests lib doesn't get full html from this url
         data = self._decode_json(homepage)

@@ -1,6 +1,6 @@
 import requests, json
 import argparse, configparser
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import partial
 import os, re
 from medium_stats.scraper import StatGrabberUser, StatGrabberPublication
@@ -191,21 +191,23 @@ def main():
         else:
             sid, uid = args.sid, args.uid
 
-        if args.all:
-            end = datetime.utcnow()
-            start = datetime(year=1999, month=1, day=1)
-        else:
-            end = args.end
-            start = args.start
+        # if args.all:
+        #     end = datetime.now(timezone.utc)
+        #     start = datetime(year=1999, month=1, day=1, tzinfo=timezone.utc)
+        # else:
+        #     end = args.end
+        #     start = args.start
 
         modes = list(args.mode)
+        print(args.start, args.end)
 
         get_folders = lambda x: [x[m]['folder'] for m in modes]
 
         print('\nGetting Preliminary Data...', end='\n\n')
         if command == 'scrape_user':
             username = args.u
-            sg = StatGrabberUser(username, sid, uid, start, end)
+            sg = StatGrabberUser(username, sid, uid, args.start, args.end, already_utc=True)
+            print(sg.start, sg.stop)
             folders = get_folders(user_mode_attrs)
             sub_dir = create_directories(args.output_dir, sg.slug, folders)
             
@@ -217,7 +219,8 @@ def main():
             
         else:
             url = args.u
-            sg = StatGrabberPublication(url, sid, uid, start, end)
+            sg = StatGrabberPublication(url, sid, uid, args.start, args.end, already_utc=True)
+            print(sg.start, sg.stop)
             folders = get_folders(pub_mode_attrs)
             sub_dir = create_directories(args.output_dir, sg.slug, folders)
             data = sg.get_all_story_overview()

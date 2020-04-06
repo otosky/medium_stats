@@ -1,6 +1,6 @@
 import unittest
 from medium_stats.cli import get_argparser, parse_scraper_args
-from medium_stats.cli import valid_date, MODE_CHOICES
+from medium_stats.cli import valid_date, USER_MODE_CHOICES, PUB_MODE_CHOICES
 import os, sys
 import argparse
 from datetime import datetime, timedelta

@@ -1,26 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import argparse
 import configparser
 from inspect import cleandoc
+from medium_stats.utils import valid_date, make_utc_explicit
+from functools import partial
 
-# TODO add mode_choices for publication
 USER_MODE_CHOICES = ['summary', 'events', 'articles', 'referrers']
 PUB_MODE_CHOICES = ['events', 'story_overview', 'articles', 'referrers']
-
-def valid_date(string):
-    if len(string) > 10:
-        try:
-            return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S")
-        except ValueError:
-            msg = f"'{string}' is not a valid datetime - must be of form YYYY-MM-DDThh:mm:ss"
-            raise argparse.ArgumentTypeError(msg)
-    else:
-        try:
-            return datetime.strptime(string, "%Y-%m-%d")
-        except ValueError:
-            msg = f"'{string}' is not a valid date - must be of form YYYY-MM-DD"
-            raise argparse.ArgumentTypeError(msg)
 
 def valid_path(path):
 
@@ -35,13 +22,9 @@ def create_directories(root_dir, handle, folders):
     sub_dir = f'{root_dir}/stats_exports/{handle}'
     if not os.path.exists(sub_dir):
         os.chdir(root_dir)
-        # TODO add mkdir for handle, i.e. slug
-        #os.makedirs(f'stats_exports/{handle}')
-        # TODO folder names passed in from dict keys
-        #folders = ['agg_stats', 'agg_events', 'post_events', 'post_referrers']
         for f in folders:
             dir_ = '{0}/{1}'.format(sub_dir, f)
-            # only make folder if doesn't already exist
+            # TODO only make folder if doesn't already exist
             os.makedirs(dir_)
     
     return sub_dir
@@ -52,7 +35,7 @@ def get_argparser():
         
         parser.add_argument('--output_dir', type=valid_path, metavar='PATH', default=os.getcwd(), help='output file directory')
         creds_group = parser.add_argument_group('creds')
-        creds_group.add_argument('--creds', default=default_creds, help='creds.ini file path with "sid" and "uid" values')
+        creds_group.add_argument('--creds', default=default_creds, help='.ini file path with "sid" and "uid" values')
         creds_group.add_argument('--sid', help='Medium session "sid" cookie value; REQUIRED if "--creds" path not supplied')
         creds_group.add_argument('--uid', help='your Medium "uid" cookie value; REQUIRED if "--creds" path not supplied')
 
@@ -60,6 +43,7 @@ def get_argparser():
         period_group.add_argument('--all', action='store_true', help='full history since your first publication')
         period_group.add_argument('--start', type=valid_date, help='stats start date, format=YYYY-MM-DD')
         period_group.add_argument('--end', type=valid_date, help='stats end date, format=YYYY-MM-DD')
+        period_group.add_argument('--is-utc', action='store_true', help='start/end times are in UTC')
 
     cli_parser = argparse.ArgumentParser()
     subparser = cli_parser.add_subparsers(title='commands', dest='command')
@@ -80,23 +64,13 @@ def get_argparser():
     usage = '''\
     medium-stats scrape_user -u USERNAME [--output_dir DIR] \
     (--creds PATH | (--sid SID --uid UID)) \
-    (--all | [--start PERIOD_START] [--end PERIOD END]) \
+    (--all | [--start PERIOD_START] [--end PERIOD END]) [--is-utc]\
     [--mode {summary, events, articles, referrers}]'''
     usage = usage.replace('    ', '')
 
     scrape_user = subparser.add_parser('scrape_user', usage=usage, help='get user statistics')
     scrape_user.add_argument('-u', metavar='USERNAME', help='your Medium username')
-    # scrape.add_argument('--output_dir', type=valid_path, metavar='PATH', default=os.getcwd(), help='output file directory')
-    # creds_group = scrape.add_argument_group('creds')
-    # creds_group.add_argument('--creds', default=default_creds, help='creds.ini file path with "sid" and "uid" values')
-    # creds_group.add_argument('--sid', help='Medium session "sid" cookie value; REQUIRED if "--creds" path not supplied')
-    # creds_group.add_argument('--uid', help='your Medium "uid" cookie value; REQUIRED if "--creds" path not supplied')
-
-    # period_group = scrape.add_argument_group('period')
-    # period_group.add_argument('--all', action='store_true', help='full history since your first publication')
-    # period_group.add_argument('--start', type=valid_date, help='stats start date, format=YYYY-MM-DD')
-    # period_group.add_argument('--end', type=valid_date, help='stats end date, format=YYYY-MM-DD')
-
+    
     add_subarguments(scrape_user)
     scrape_user.add_argument('--mode', nargs='*', 
                         choices=USER_MODE_CHOICES, default=USER_MODE_CHOICES, 
@@ -106,7 +80,7 @@ def get_argparser():
     usage = '''\
     medium-stats scrape_publication -u URL [--output_dir DIR] \
     (--creds PATH | (--sid SID --uid UID)) \
-    (--all | [--start PERIOD_START] [--end PERIOD END]) \
+    (--all | [--start PERIOD_START] [--end PERIOD END]) [--is-utc]\
     [--mode {events, story_overview, articles, referrers}]'''
     usage = usage.replace('    ', '')
 
@@ -114,7 +88,6 @@ def get_argparser():
     # TODO - change help below
     scrape_pub.add_argument('-u', metavar='URL', help='publication URL')
     add_subarguments(scrape_pub)
-    # TODO -change args below
     scrape_pub.add_argument('--mode', nargs='*', 
                         choices=PUB_MODE_CHOICES, default=PUB_MODE_CHOICES, 
                         help='limit retrieval to particular statistics; defaults to all modes')
@@ -123,13 +96,17 @@ def get_argparser():
 
 def parse_scraper_args(args, parser):
 
+    args.creds = args.creds.replace('~', str(os.path.expanduser('~')))
+    
+    if not os.path.exists(args.creds):
+        parser.error(f'''Creds File does not exist at: {args.creds}''')
+
     cookies_supplied = bool(args.sid or args.uid)
     if cookies_supplied and not bool(args.sid and args.uid):
         parser.error('Need both "sid" and "uid" arguments together.')
     
     if cookies_supplied:
         args.creds=None
-    # TODO add a check to see if args.creds is path or directory
 
     if not bool(args.all or args.start or args.end):
         parser.error('Period must be set as "--all" or a range with "--start" and/or "--stop" values')
@@ -137,10 +114,14 @@ def parse_scraper_args(args, parser):
     if args.all:
         if args.all and bool(args.start or args.end):
             parser.error('''Can't use "--all" flag with "start" or "end" arguments''')
+        if args.all and args.is_utc:
+            parser.error('''Can't use "--all" flag with "--is-utc" flag''')
+        args.end = datetime.now(timezone.utc)
+        args.start = datetime(year=1999, month=1, day=1, tzinfo=timezone.utc)
     else:
         if bool(args.start or args.end):
             if not args.end:
-                end = datetime.utcnow()
+                end = datetime.now(timezone.utc)
                 args.end = datetime(*end.timetuple()[:3])
             if not args.start:
                 start = args.end - timedelta(days=1)
@@ -149,6 +130,11 @@ def parse_scraper_args(args, parser):
         if args.end < args.start:
             parser.error('Period "--end" cannot be prior to "--start"')
 
+    # TODO convert to UTC here
+    # 1 - (cast) and make utc explicit, using already_utc flag as argument to function
+    make_utc = partial(make_utc_explicit, utc_naive=args.is_utc)
+    args.start, args.end = map(make_utc, (args.start, args.end))
+    
     return args
 
 class MediumConfigHelper:
