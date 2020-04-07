@@ -122,18 +122,19 @@ def parse_scraper_args(args, parser):
         if bool(args.start or args.end):
             if not args.end:
                 end = datetime.now(timezone.utc)
-                args.end = datetime(*end.timetuple()[:3])
+                args.end = datetime(*end.timetuple()[:3]).replace(tzinfo=timezone.utc)
             if not args.start:
                 start = args.end - timedelta(days=1)
-                args.start = datetime(*start.timetuple()[:3])
-        # make sure start and end obey time-order
-        if args.end < args.start:
-            parser.error('Period "--end" cannot be prior to "--start"')
+                args.start = datetime(*start.timetuple()[:3]).replace(tzinfo=timezone.utc)
 
     # TODO convert to UTC here
     # 1 - (cast) and make utc explicit, using already_utc flag as argument to function
     make_utc = partial(make_utc_explicit, utc_naive=args.is_utc)
     args.start, args.end = map(make_utc, (args.start, args.end))
+
+    # make sure start and end obey time-order
+    if args.end < args.start:
+        parser.error('Period "--end" cannot be prior to "--start"')
     
     return args
 
