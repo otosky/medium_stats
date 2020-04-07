@@ -3,7 +3,7 @@ from medium_stats.cli import get_argparser, parse_scraper_args
 from medium_stats.cli import valid_date, USER_MODE_CHOICES, PUB_MODE_CHOICES
 import os, sys
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from contextlib import contextmanager
 from io import StringIO
 
@@ -25,8 +25,8 @@ class TestScraperCLIArguments(unittest.TestCase):
     
     def test_sid_and_uid_required_together_if_input(self):
         
-        invalid_sid = 'scrape --sid foo -u test_user'.split()
-        invalid_uid = 'scrape --uid bar -u test_user'.split()
+        invalid_sid = 'scrape_user --sid foo -u test_user'.split()
+        invalid_uid = 'scrape_user --uid bar -u test_user'.split()
         
         invalids = [invalid_sid, invalid_uid]
         invalids = [self.parser.parse_args(i) for i in invalids]
@@ -37,23 +37,25 @@ class TestScraperCLIArguments(unittest.TestCase):
                     _ = parse_scraper_args(i, self.parser)
             msg = err.getvalue()
             self.assertIn('both "sid" and "uid" arguments', msg)
-        
-    def test_creds_path_and_cookies_mutually_exclusive(self):
 
-        invalid = 'scrape --sid foo --uid bar --creds path/to/file -u test_user'.split()
+    # TODO delete if not updated
+    # def test_creds_path_and_cookies_mutually_exclusive(self):
 
-        args = self.parser.parse_args(invalid)
+    #     invalid = 'scrape_user --sid foo --uid bar --creds path/to/file -u test_user'.split()
 
-        with self.assertRaises(SystemExit) as e:
-            with capture_sys_output() as (out, err): 
-                    _ = parse_scraper_args(args, self.parser)
-        msg = err.getvalue()
-        self.assertRegex(msg, r'Set creds via "creds".+ Not both.$')
+    #     args = self.parser.parse_args(invalid)
+
+    #     with self.assertRaises(SystemExit) as e:
+    #         with capture_sys_output() as (out, err): 
+    #                 _ = parse_scraper_args(args, self.parser)
+    #     msg = err.getvalue()
+    #     self.assertRegex(msg, r'Set creds via "creds".+ Not both.$')
 
     def test_period_set(self):
-
-        invalid_cred_explicit = 'scrape --creds path/to -u test_user'.split()
-        invalid_cred_implicit = 'scrape -u test_user'.split()
+        
+        # TODO - this hits error because creds path needs to be mocked
+        invalid_cred_explicit = 'scrape_user --creds path/to -u test_user'.split()
+        invalid_cred_implicit = 'scrape_user -u test_user'.split()
 
         invalids = [invalid_cred_explicit, invalid_cred_implicit]
         invalids = [self.parser.parse_args(i) for i in invalids]
@@ -67,9 +69,9 @@ class TestScraperCLIArguments(unittest.TestCase):
 
     def test_all_and_period_flags_mutually_exclusive(self):
 
-        invalid1 = 'scrape -u test_user --all --start 2020-01-01'.split()
-        invalid2 = 'scrape -u test_user --all --end 2020-01-01'.split()
-        invalid3 = 'scrape -u test_user --all --start 2020-01-01 --end 2020-02-01'.split()
+        invalid1 = 'scrape_user -u test_user --all --start 2020-01-01'.split()
+        invalid2 = 'scrape_user -u test_user --all --end 2020-01-01'.split()
+        invalid3 = 'scrape_user -u test_user --all --start 2020-01-01 --end 2020-02-01'.split()
 
         invalids = [invalid1, invalid2, invalid3]
         invalids = [self.parser.parse_args(i) for i in invalids]
@@ -83,10 +85,10 @@ class TestScraperCLIArguments(unittest.TestCase):
 
     def test_period_end_defaults_to_most_recent_full_day_utc(self):
         
-        input_ = 'scrape -u test_user --start 2020-01-01'.split()
+        input_ = 'scrape_user -u test_user --start 2020-01-01'.split()
 
-        now = datetime.utcnow()
-        now = datetime(*now.timetuple()[:3])
+        now = datetime.now(timezone.utc)
+        now = datetime(*now.timetuple()[:3]).replace(tzinfo=timezone.utc)
         args = self.parser.parse_args(input_)
         args = parse_scraper_args(args, self.parser)
 
@@ -94,10 +96,11 @@ class TestScraperCLIArguments(unittest.TestCase):
 
     def test_period_start_defaults_beginning_day_prior_to_end(self):
         
-        input_d = 'scrape -u test_user --end 2020-02-01'.split()
-        input_dt = 'scrape -u test_user --end 2020-02-01T12:00:00'.split()
+        input_d = 'scrape_user -u test_user --end 2020-02-01'.split()
+        input_dt = 'scrape_user -u test_user --end 2020-02-01T12:00:00'.split()
 
         start = datetime.strptime('2020-01-31', '%Y-%m-%d')
+        start = start.replace(tzinfo=timezone.utc)
         for i in [input_d, input_dt]:
             args = self.parser.parse_args(i)
             args = parse_scraper_args(args, self.parser)
@@ -135,7 +138,7 @@ class TestScraperCLIArguments(unittest.TestCase):
             with self.assertRaises(argparse.ArgumentTypeError) as e:
                 _ = valid_date(c)
             msg = e.exception.args[0]
-            self.assertIn('not a valid datetime - must be of form YYYY-MM-DDThh:mm:ss', msg)
+            self.assertIn('datetime - must be of form YYYY-MM-DDThh:mm:ss', msg)
             
     def test_valid_date_func_returns_date_format_msg(self): 
 
@@ -150,14 +153,14 @@ class TestScraperCLIArguments(unittest.TestCase):
             with self.assertRaises(argparse.ArgumentTypeError) as e:
                 _ = valid_date(c)
             msg = e.exception.args[0]
-            self.assertIn('not a valid date - must be of form YYYY-MM-DD', msg)
+            self.assertIn('datetime - must be of form YYYY-MM-DD', msg)
 
     def test_period_start_accepts_date_string_format(self):
         
         start = '2020-01-01'
         start_dt = datetime.strptime(start, '%Y-%m-%d')
 
-        input_ = f'scrape -u test_user --start {start}'.split()
+        input_ = f'scrape_user -u test_user --start {start}'.split()
     
         args = self.parser.parse_args(input_)
         self.assertEqual(args.start, start_dt)
@@ -167,7 +170,7 @@ class TestScraperCLIArguments(unittest.TestCase):
         start = '2020-01-01T12:00:59'
         start_dt = datetime.strptime(start, '%Y-%m-%dT%H:%M:%S')
 
-        input_ = f'scrape -u test_user --start {start}'.split()
+        input_ = f'scrape_user -u test_user --start {start}'.split()
         
         args = self.parser.parse_args(input_)
         self.assertEqual(args.start, start_dt)
@@ -177,7 +180,7 @@ class TestScraperCLIArguments(unittest.TestCase):
         end = '2020-01-01'
         end_dt = datetime.strptime(end, '%Y-%m-%d')
 
-        input_ = f'scrape -u test_user --end {end}'.split()
+        input_ = f'scrape_user -u test_user --end {end}'.split()
     
         args = self.parser.parse_args(input_)
         self.assertEqual(args.end, end_dt)
@@ -187,7 +190,7 @@ class TestScraperCLIArguments(unittest.TestCase):
         end = '2020-01-01T12:00:59'
         end_dt = datetime.strptime(end, '%Y-%m-%dT%H:%M:%S')
 
-        input_ = f'scrape -u test_user --end {end}'.split()
+        input_ = f'scrape_user -u test_user --end {end}'.split()
         
         args = self.parser.parse_args(input_)
         self.assertEqual(args.end, end_dt)
@@ -199,8 +202,8 @@ class TestScraperCLIArguments(unittest.TestCase):
         end = '2020-01-01'
         end_dt = '2020-01-01T00:00:00'
 
-        input1 = f'scrape -u test_user --start {start} --end {end}'.split()
-        input2 = f'scrape -u test_user --start {start_dt} --end {end_dt}'.split()
+        input1 = f'scrape_user -u test_user --start {start} --end {end}'.split()
+        input2 = f'scrape_user -u test_user --start {start_dt} --end {end_dt}'.split()
 
         args_list = [self.parser.parse_args(i) for i in [input1, input2]]
         for a in args_list:
@@ -212,7 +215,7 @@ class TestScraperCLIArguments(unittest.TestCase):
 
     def test_output_dir_default(self):
         
-        input_ = 'scrape -u test_user --all'.split()
+        input_ = 'scrape_user -u test_user --all'.split()
         parsed = self.parser.parse_args(input_)
         parsed = parse_scraper_args(parsed, self.parser)
         
@@ -223,7 +226,7 @@ class TestScraperCLIArguments(unittest.TestCase):
 
     def test_creds_default_location_beneath_home(self):
         
-        input_ = 'scrape -u test_user --all'.split()
+        input_ = 'scrape_user -u test_user --all'.split()
         parsed = self.parser.parse_args(input_)
         parsed = parse_scraper_args(parsed, self.parser)
         
@@ -231,9 +234,9 @@ class TestScraperCLIArguments(unittest.TestCase):
 
     def test_mode_flag_returns_list(self):
 
-        input1 = 'scrape -u test_user --all --mode events'.split()
-        input2 = 'scrape -u test_user --all --mode events referrers'.split() 
-        input3 = 'scrape -u test_user --start 2020-01-01 --end 2020-02-01'.split()
+        input1 = 'scrape_user -u test_user --all --mode events'.split()
+        input2 = 'scrape_user -u test_user --all --mode events referrers'.split() 
+        input3 = 'scrape_user -u test_user --start 2020-01-01 --end 2020-02-01'.split()
 
         parsed = [self.parser.parse_args(i) for i in [input1, input2, input3]]
         parsed = [parse_scraper_args(p, self.parser) for p in parsed]
@@ -243,14 +246,22 @@ class TestScraperCLIArguments(unittest.TestCase):
 
     def test_implicit_mode_defaults_to_all_choices(self):
         
-        input1 = 'scrape -u test_user --all'.split()
-        input2 = 'scrape -u test_user --start 2020-01-01 --end 2020-02-01'.split()
+        in1 = 'scrape_user -u test_user --all'.split()
+        in2 = 'scrape_user -u test_user --start 2020-01-01 --end 2020-02-01'.split()
+        in3 = 'scrape_publication -u test_pub --all'.split()
+        in4 = 'scrape_publication -u test_pub --start 2020-01-01 --end 2020-02-01'.split()
 
-        parsed = [self.parser.parse_args(i) for i in [input1, input2]]
-        parsed = [parse_scraper_args(p, self.parser) for p in parsed]
+
+        parsed_user = [self.parser.parse_args(i) for i in [in1, in2]]
+        parsed_user = [parse_scraper_args(p, self.parser) for p in parsed_user]
+        for p in parsed_user:
+            self.assertEqual(p.mode, USER_MODE_CHOICES)
+
+        parsed_pub = [self.parser.parse_args(i) for i in [in3, in4]]
+        parsed_pub = [parse_scraper_args(p, self.parser) for p in parsed_pub]
+        for p in parsed_pub:
+            self.assertEqual(p.mode, PUB_MODE_CHOICES)
         
-        for p in parsed:
-            self.assertEqual(p.mode, MODE_CHOICES)
         
 class TestCookieFetcherCLIArguments(unittest.TestCase):
     
