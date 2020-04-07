@@ -241,7 +241,9 @@ class StatGrabberUser(StatGrabberBase):
 class StatGrabberPublication(StatGrabberBase):
 
     def __init__(self, url, sid, uid, start, stop, now=None, already_utc=False):
-
+        
+        if not re.search("^https://", url):
+            url = 'https://' + url
         self.url = url
         super().__init__(sid, uid, start, stop, now, already_utc)
         homepage = self._fetch(self.url)
