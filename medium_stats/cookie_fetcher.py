@@ -49,7 +49,7 @@ class MediumAuthorizer:
             email_input.find_element_by_xpath('//input[@role="button"]').click()
             form2_locator = (By.XPATH, '//form[@action="/signin/v2/challenge/password/empty"]')
         
-        password_input = WebDriverWait(driver, 10).until(EC.visibility_of_element_located(form2_locator))
+        password_input = WebDriverWait(driver, 10).until(EC.presence_of_element_located(form2_locator))
         password_input.find_element_by_xpath('//input[@type="password"]').send_keys(self.password)
         
         if headless:
