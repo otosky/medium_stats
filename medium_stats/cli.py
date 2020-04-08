@@ -9,6 +9,8 @@ from functools import partial
 USER_MODE_CHOICES = ['summary', 'events', 'articles', 'referrers']
 PUB_MODE_CHOICES = ['events', 'story_overview', 'articles', 'referrers']
 
+valid_date = partial(valid_date, error=argparse.ArgumentTypeError, to_utc=False)
+
 def valid_path(path):
 
     is_valid = os.path.exists(path)
