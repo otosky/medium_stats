@@ -34,7 +34,7 @@ Create a `.medium_creds.ini` file to hold these cookie values:
 
 ```bash
 cat > path_to_directory/.medium_creds.ini << EOF
-[MEDIUM]
+[your_medium_handle_here]
 sid=insert_sid_value_here
 uid=insert_uid_value_here
 EOF
@@ -42,6 +42,9 @@ EOF
 #Note: the default behavior of the package will search your home directory for 
 #this file, but you are welcome to set it to whatever directory you like and 
 #pass that path as an argument to the CLI tool.
+
+#Note: your Medium "handle" is your Medium username without the "@" prefix,
+#e.g. "olivertosky" from https://medium.com/@olivertosky
 ```
 
 ***
@@ -59,11 +62,11 @@ Chrome installed.*
 Currently only valid for Gmail OAuth:
 
 ```bash
-$ medium-stats fetch-cookies --email [EMAIL] --pwd [PASSWORD]
+$ medium-stats fetch_cookies -u [HANDLE] --email [EMAIL] --pwd [PASSWORD]
 
 # Or specify that your password should be pulled from an environment variable:
 $ export MEDIUM_AUTH_PWD='[PASSWORD]'
-$ medium-stats fetch-cookies --email [EMAIL] --pwd-in-env
+$ medium-stats fetch_cookies -u [HANDLE] --email [EMAIL] --pwd-in-env
 ```
 
 ### Step 2 - *Optional*:
@@ -108,6 +111,7 @@ FLAGS:
 | --all        | gets all stats until now |                        |
 | --end        |    end of period for stats fetched [exclusive]    | now (UTC) |
 | --start      | beginning of period for stats fetched [inclusive] | --end minus 1 day @midnight |
+| --is-utc     | whether start/stop are already in UTC time        | False |
 | --output-dir |          directory to hold stats exports          | current working directory |
 | --creds      |              path to credentials file             | ~/.medium_stats.ini |
 | --sid        |          your Medium session id from cookie       |
@@ -119,9 +123,12 @@ FLAGS:
 Basic Usage:
 ```python
 from medium_stats.scraper import StatGrabber
+from datetime import datetime
 
-# get aggregated summary statistics; "start" & "stop" params also accept datetime objects
-me = StatGrabber('username', sid='sid', uid='uid', start='2020-03-01', stop='2020-04-01')
+start = datetime(year=2020, month=1, day=1)
+stop = datetime(year=2020, month=4, day=1)
+# get aggregated summary statistics; note: start/stop will be converted to UTC
+me = StatGrabberUser('username', sid='sid', uid='uid', start=start, stop=stop)
 data = me.get_summary_stats()
 
 # get the unattributed event logs for all your stories:
@@ -133,7 +140,12 @@ articles = me.get_article_ids(data) # returns a list of article_ids
 article_events = me.get_all_story_stats(articles) # daily event logs
 referrers = me.get_all_story_stats(articles, type_='referrer') # all-time referral sources
 
-
+pub = StatGrabberPublication(url, cfg.sid, cfg.uid, start, end)
+views = pub.get_events(type_='views')
+visitors = pub.get_events(type_='visitors')
+stories = pub.get_all_story_overview()
+articles = pub.get_article_ids(stories)
+data = pub.get_all_story_stats(articles)
 ```
 
 Note: "summary_stats" and "referrer" data pre-aggregates to your full history, 
