@@ -192,7 +192,6 @@ def main():
             sid, uid = args.sid, args.uid
 
         modes = list(args.mode)
-        print(args.start, args.end)
 
         get_folders = lambda x: [x[m]['folder'] for m in modes]
 
@@ -200,7 +199,6 @@ def main():
         if command == 'scrape_user':
             username = args.u
             sg = StatGrabberUser(username, sid, uid, args.start, args.end, already_utc=True)
-            print(sg.start, sg.stop)
             folders = get_folders(user_mode_attrs)
             sub_dir = create_directories(args.output_dir, sg.slug, folders)
             
