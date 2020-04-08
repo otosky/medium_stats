@@ -14,12 +14,10 @@ def check_dependencies_missing(extras=extras):
     missing = [z[0] for z in zip(extras, dependencies) if not z[1]]
     return missing
 
-def valid_date(string, error, to_utc=True):
+def valid_date(string, error):
     if len(string) > 10:
         try:
             dt = datetime.strptime(string, "%Y-%m-%dT%H:%M:%S")
-            if to_utc:
-                dt = dt.astimezone(timezone.utc)
             return dt
         except ValueError:
             msg = f"'{string}' cannot be parsed as datetime - must be of form YYYY-MM-DDThh:mm:ss"
@@ -27,22 +25,10 @@ def valid_date(string, error, to_utc=True):
     else:
         try:
             dt = datetime.strptime(string, "%Y-%m-%d")
-            if to_utc:
-                dt = dt.astimezone(timezone.utc)
             return dt
         except ValueError:
             msg = f"'{string}' cannot be parsed as datetime - must be of form YYYY-MM-DD"
             raise error(msg)
-
-valid_date = partial(valid_date, error=argparse.ArgumentTypeError, to_utc=False)
-
-# def ensure_datetime(dt):
-        
-#     if not isinstance(dt, datetime):
-#         msg = f'argument "{dt}" must be of type datetime.datetime'
-#         raise TypeError(msg)
-        
-#     return dt
 
 def dt_formatter(dt, output):
     
@@ -50,6 +36,8 @@ def dt_formatter(dt, output):
         dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
     elif output == 'filename':
         dt = dt.strftime('%Y%m%dT%H%M%S')
+    else:
+        raise ValueError(f'output param must be either "json" or "filename" not "{output}"')
         
     return dt    
 
