@@ -165,7 +165,7 @@ referrers = me.get_all_story_stats(articles, type_='referrer') # all-time referr
 #### FOR A PUBLICATION ####
 from medium_stats.scraper import StatGrabberPublication
 
-pub = StatGrabberPublication('medium.com/test-publication', cfg.sid, cfg.uid, start, end)
+pub = StatGrabberPublication('medium.com/test-publication', 'sid', 'uid', start, stop)
 
 # get publication views & visitors (like the stats landing page)
 views = pub.get_events(type_='views')
@@ -175,7 +175,7 @@ visitors = pub.get_events(type_='visitors')
 story_stats = pub.get_all_story_overview()
 
 # get individual article statistics
-articles = pub.get_article_ids(stories)
+articles = pub.get_article_ids(story_stats)
 
 article_events = pub.get_all_story_stats(articles)
 referrers = pub.get_all_story_stats(articles, type_='referrer')
