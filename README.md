@@ -262,7 +262,7 @@ from medium_stats.cli import MediumConfigHelper
 
 default_creds = os.path.join(os.path.expanduser('~'), '.medium_creds.ini')
 
-cookies = MediumConfigHelper(default_creds)
+cookies = MediumConfigHelper(config_path=default_creds, account_name='your_handle')
 sid = cookies.sid
 uid = cookies.uid
 ```
