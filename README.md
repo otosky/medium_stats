@@ -94,15 +94,27 @@ target_stats_directory/
 Simple Use: 
 
 ```bash
-$ medium-stats scrape -u [USERNAME] --all
+$ medium-stats scrape_user -u [USERNAME] --all
 ```
 
-> This will get all Medium stats until now. 
+> This will get all Medium stats for a user until now. 
+
+
+For a publication:
+```bash
+$ medium-stats scrape_publication -u [URL] --all
+
+# Valid example urls: 
+# 'https://medium.com/test-publication', 'medium.com/test-publication', 
+# 'https://custom.subdomain.com', 'custom.subdomain.com'
+```
 
 General Use pattern:
 ```bash
-medium-stats scrape -u USERNAME [--output_dir DIR] (--creds PATH | (--sid SID --uid UID)) \
-(--all | [--start PERIOD_START] [--end PERIOD END]) [--mode {summary, events, articles, referrers}]
+medium-stats (scrape_user | scrape_publication) -u USERNAME/URL [--output_dir DIR] \
+(--creds PATH | (--sid SID --uid UID)) \
+(--all | [--start PERIOD_START] [--end PERIOD END]) [--is-utc] \
+[--mode {summary, events, articles, referrers, story_overview}]
 ```
 FLAGS:
 
@@ -116,7 +128,8 @@ FLAGS:
 | --creds      |              path to credentials file             | ~/.medium_stats.ini |
 | --sid        |          your Medium session id from cookie       |
 | --uid        |          your Medium user id from cookie          |
-| --mode       |       limits retrieval to particular statistics   | ['summary', 'events', 'articles', 'referrers']|
+| --mode       |       limits retrieval to particular statistics   | ['summary', 'events', 'articles', 'referrers'] for scrape_user|
+|              |                  | ['events', 'story_overview', 'articles', 'referrers'] for scrape_publication
 
 ### Python
 
@@ -127,6 +140,8 @@ from datetime import datetime
 
 start = datetime(year=2020, month=1, day=1)
 stop = datetime(year=2020, month=4, day=1)
+
+#### FOR A USER ####
 # get aggregated summary statistics; note: start/stop will be converted to UTC
 me = StatGrabberUser('username', sid='sid', uid='uid', start=start, stop=stop)
 data = me.get_summary_stats()
@@ -140,12 +155,25 @@ articles = me.get_article_ids(data) # returns a list of article_ids
 article_events = me.get_all_story_stats(articles) # daily event logs
 referrers = me.get_all_story_stats(articles, type_='referrer') # all-time referral sources
 
-pub = StatGrabberPublication(url, cfg.sid, cfg.uid, start, end)
+#### FOR A PUBLICATION ####
+pub = StatGrabberPublication('medium.com/test-publication', cfg.sid, cfg.uid, start, end)
+
+# get publication views & visitors (like the stats landing page)
 views = pub.get_events(type_='views')
 visitors = pub.get_events(type_='visitors')
-stories = pub.get_all_story_overview()
+
+# get summary stats for all publication articles
+story_stats = pub.get_all_story_overview()
+
+# get individual article statistics
 articles = pub.get_article_ids(stories)
-data = pub.get_all_story_stats(articles)
+
+article_events = pub.get_all_story_stats(articles)
+referrers = pub.get_all_story_stats(articles, type_='referrer')
+
+# Note: if you want to specify naive-UTC datetimes, set already_utc=True in the class instantiation to
+# avoid offset being applied.  Better practice is to just input tz-aware datetimes to "start" & "stop"
+# params in the first place...
 ```
 
 Note: "summary_stats" and "referrer" data pre-aggregates to your full history, 
