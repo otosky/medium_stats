@@ -275,9 +275,11 @@ class StatGrabberPublication(StatGrabberBase):
             self.domain = None
         creation = self.attrs_json['metadata']['activeAt']
         creation = datetime.fromtimestamp(creation / 1e3, timezone.utc)
-        # if self.start < creation:
-        #     self.start = creation
-        #     self.start_unix = convert_datetime_to_unix(self.start)
+        # timestamps come in hourly buckets, so this is a safety mechanism
+        creation = creation - timedelta(hours=2) 
+        if self.start < creation:
+            self.start = creation
+            self.start_unix = convert_datetime_to_unix(self.start)
 
     def __repr__(self):
         return f'{self.name} - {self.description}'
@@ -288,7 +290,6 @@ class StatGrabberPublication(StatGrabberBase):
             response = self._fetch(self.views_endpoint)
         elif type_ == 'visitors':
             response = self._fetch(self.visitors_endpoint)
-        # TODO: add error message for "type_" not allowed
         else:
             raise ValueError('"type_" param must be either "views" or "visitors"')
         
