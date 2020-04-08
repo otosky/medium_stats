@@ -81,11 +81,12 @@ $ mkdir path_to_target_stats_directory
 Once executed the CLI tool will create the following directory structure:
 ```
 target_stats_directory/
-    stats_exports/
-        agg_stats/ 
-        agg_events/ 
-        post_events/
-        post_referrers/
+    [HANDLE]/
+        stats_exports/
+            agg_stats/ 
+            agg_events/ 
+            post_events/
+            post_referrers/
 ```
 
 ## Usage
