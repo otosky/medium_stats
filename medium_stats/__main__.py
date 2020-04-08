@@ -177,7 +177,7 @@ def main():
         
         email, password = unpack_email_pwd(args)
         
-        me = MediumAuthorizer(email, password)
+        me = MediumAuthorizer(args.u, email, password)
         me.sign_in()
         me.save_cookies(args.creds)
         print(section_break)

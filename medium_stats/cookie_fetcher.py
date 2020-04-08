@@ -22,8 +22,9 @@ chrome_options.add_argument("--headless")
 
 class MediumAuthorizer:
 
-    def __init__(self, email, password):
-
+    def __init__(self, handle, email, password):
+        
+        self.handle = handle
         self.email = email
         self.password = password
         
@@ -68,11 +69,11 @@ class MediumAuthorizer:
         print('\nExtracting session cookies...', end='\n\n')
         cookies = self.driver.get_cookies()
         config = configparser.ConfigParser()
-        config['MEDIUM'] = {}
+        config[self.handle] = {}
         for c in cookies:
             if c['name'] in ['sid', 'uid']:
                 k = c['name']
-                config['MEDIUM'][k] = c['value']
+                config[self.handle][k] = c['value']
         ## write cookies out to .ini file
         print('Writing cookies to credentials file...')
         with open(path, 'w') as f:
