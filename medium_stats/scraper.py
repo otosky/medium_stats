@@ -116,7 +116,9 @@ class StatGrabberBase:
         if not now:
             self.now = datetime.now(timezone.utc)
         else:
-            self.now = now
+            if not now.tzinfo:
+                raise AttributeError(f'"now" param ({now}) must be tz-aware datetime')
+            self.now = make_utc_explicit(now, utc_naive=False)
 
     def _setup_requests(self):
         
@@ -135,9 +137,11 @@ class StatGrabberBase:
 
     def _decode_json(self, response):
 
+        # TODO add TypeError if response is not a response object
         cleaned = response.text.replace('])}while(1);</x>', '')
         return json.loads(cleaned)['payload']
 
+    # TODO - delete if unnecessary
     def _find_data_in_html(self, response):
 
         etree = html.fromstring(response)
@@ -270,9 +274,7 @@ class StatGrabberPublication(StatGrabberBase):
         except:
             self.domain = None
         creation = self.attrs_json['metadata']['activeAt']
-        print('creation_time', creation)
         creation = datetime.fromtimestamp(creation / 1e3, timezone.utc)
-        print('creation_time', creation)
         # if self.start < creation:
         #     self.start = creation
         #     self.start_unix = convert_datetime_to_unix(self.start)
