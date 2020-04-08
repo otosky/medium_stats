@@ -17,7 +17,7 @@ def capture_sys_output():
     finally:
         sys.stdout, sys.stderr = current_out, current_err
 
-class TestScraperCLIArguments(unittest.TestCase):
+class TestScrapeUserCLIArguments(unittest.TestCase):
     
     def setUp(self):
         self.parser = get_argparser()
@@ -105,55 +105,6 @@ class TestScraperCLIArguments(unittest.TestCase):
             args = self.parser.parse_args(i)
             args = parse_scraper_args(args, self.parser)
             self.assertEqual(args.start, start)
-    
-    def test_valid_date_func_returns_datetime(self):
-        
-        dt_ = '2020-01-01T12:00:05'
-        dt_correct = datetime.strptime(dt_, '%Y-%m-%dT%H:%M:%S')
-        d_ = '2020-01-01'
-        d_correct = datetime.strptime(d_, '%Y-%m-%d')
-
-        self.assertEqual(valid_date(dt_), dt_correct)
-        self.assertEqual(valid_date(d_), d_correct)
-
-    def test_valid_date_func_returns_argument_error_type(self):
-
-        wrong_dt = '2020-01-01T12:99:00'
-        wrong_d = '2020-15-01'
-
-        for c in [wrong_dt, wrong_d]:
-            with self.assertRaises(argparse.ArgumentTypeError) as e:
-                _ = valid_date(c)
-            self.assertIsInstance(e.exception, argparse.ArgumentTypeError)
-
-    def test_valid_date_func_raises_datetime_format_msg(self):
-
-        dt1 = '2020-01-01T120005'
-        dt2 = '20200101T999999'
-        dt3 = '2020-01-01T12:99:00'
-        dt4 = 'elevenchars'
-
-        cases = [dt1, dt2, dt3, dt4]
-        for c in cases:
-            with self.assertRaises(argparse.ArgumentTypeError) as e:
-                _ = valid_date(c)
-            msg = e.exception.args[0]
-            self.assertIn('datetime - must be of form YYYY-MM-DDThh:mm:ss', msg)
-            
-    def test_valid_date_func_returns_date_format_msg(self): 
-
-        d1 = '2020-15-01'
-        d2 = '20200101'
-        d3 = '01/01/2020'
-        d4 = 'atTenChars'
-        d5 = 'wrong'
-
-        cases = [d1, d2, d3, d4, d5]
-        for c in cases:
-            with self.assertRaises(argparse.ArgumentTypeError) as e:
-                _ = valid_date(c)
-            msg = e.exception.args[0]
-            self.assertIn('datetime - must be of form YYYY-MM-DD', msg)
 
     def test_period_start_accepts_date_string_format(self):
         
