@@ -136,12 +136,15 @@ FLAGS:
 
 Basic Usage:
 ```python
-from medium_stats.scraper import StatGrabber
+#### SETUP ####
 from datetime import datetime
 
 start = datetime(year=2020, month=1, day=1)
 stop = datetime(year=2020, month=4, day=1)
+```
 
+```python
+from medium_stats.scraper import StatGrabberUser
 #### FOR A USER ####
 # get aggregated summary statistics; note: start/stop will be converted to UTC
 me = StatGrabberUser('username', sid='sid', uid='uid', start=start, stop=stop)
@@ -155,7 +158,10 @@ articles = me.get_article_ids(data) # returns a list of article_ids
 
 article_events = me.get_all_story_stats(articles) # daily event logs
 referrers = me.get_all_story_stats(articles, type_='referrer') # all-time referral sources
+```
 
+```python
+from medium_stats.scraper import StatGrabberPublication
 #### FOR A PUBLICATION ####
 pub = StatGrabberPublication('medium.com/test-publication', cfg.sid, cfg.uid, start, end)
 
