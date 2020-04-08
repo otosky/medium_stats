@@ -191,13 +191,6 @@ def main():
         else:
             sid, uid = args.sid, args.uid
 
-        # if args.all:
-        #     end = datetime.now(timezone.utc)
-        #     start = datetime(year=1999, month=1, day=1, tzinfo=timezone.utc)
-        # else:
-        #     end = args.end
-        #     start = args.start
-
         modes = list(args.mode)
         print(args.start, args.end)
 
@@ -220,7 +213,6 @@ def main():
         else:
             url = args.u
             sg = StatGrabberPublication(url, sid, uid, args.start, args.end, already_utc=True)
-            print(sg.start, sg.stop)
             folders = get_folders(pub_mode_attrs)
             sub_dir = create_directories(args.output_dir, sg.slug, folders)
             data = sg.get_all_story_overview()
