@@ -129,8 +129,7 @@ def parse_scraper_args(args, parser):
                 start = args.end - timedelta(days=1)
                 args.start = datetime(*start.timetuple()[:3]).replace(tzinfo=timezone.utc)
 
-    # TODO convert to UTC here
-    # 1 - (cast) and make utc explicit, using already_utc flag as argument to function
+    # convert to UTC here
     make_utc = partial(make_utc_explicit, utc_naive=args.is_utc)
     args.start, args.end = map(make_utc, (args.start, args.end))
 
@@ -142,33 +141,42 @@ def parse_scraper_args(args, parser):
 
 class MediumConfigHelper:
 
-    def __init__(self, config_path):
+    def __init__(self, config_path, account_name):
 
-        self.cookies = self._retrieve_cookies(config_path)
+        self.handle = account_name
+        self.cookies = MediumConfigHelper._retrieve_cookies(config_path, account_name)
         self.sid = self.cookies['sid']
         self.uid = self.cookies['uid']
-
-    def _validate_config(self, config_path):
+    
+    @staticmethod
+    def _validate_config(config_path, account_name):
+        '''
+        Checks to see if config file has correct sections:
+        [account_name]
+        sid = sid_here
+        uid = uid_here
+        '''
 
         config = configparser.ConfigParser()
         config.read(config_path)
-        section = config.has_section('MEDIUM')
+        section = config.has_section(account_name)
         if not section:
-            raise ValueError('Config file not properly formed')
+            raise ValueError(f'Account name "{account_name}" not found in section headers')
         options = ['sid', 'uid']
-        option_exists = [config.has_option('MEDIUM', opt) for opt in options]
-        if sum(option_exists) != len(options):
+        option_exists = [config.has_option(account_name, opt) for opt in options]
+        if sum(option_exists) < len(options):
             raise ValueError('Config file not properly formed')
         
         return config
 
-    def _retrieve_cookies(self, config_path):
+    @classmethod
+    def _retrieve_cookies(cls, config_path, account_name):
 
         config_exists = os.path.exists(config_path)
         if not config_exists:
             raise ValueError('Config file does not exist')
         
-        config = self._validate_config(config_path)
-        cookies = config['MEDIUM']
+        config = cls._validate_config(config_path, account_name)
+        cookies = config[account_name]
         
         return dict(cookies)

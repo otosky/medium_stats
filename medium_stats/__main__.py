@@ -186,7 +186,7 @@ def main():
         args = parse_scraper_args(args, parser)
         
         if args.creds:
-            cfg = MediumConfigHelper(args.creds)
+            cfg = MediumConfigHelper(args.creds, args.u)
             sid, uid = cfg.sid, cfg.uid
         else:
             sid, uid = args.sid, args.uid
