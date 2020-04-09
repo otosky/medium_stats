@@ -9,13 +9,14 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='medium-stats',
-    version='2.0.0',
+    version='2.1.0',
     entry_points={
         'console_scripts': [
             'medium-stats = medium_stats.__main__:main'
         ]
     },
     packages=find_packages(exclude=("tests",)),
+    python_requires='>=3.6',
     install_requires = ['requests', 'lxml'],
     extras_require={
         'selenium': ['selenium', 'webdriver_manager']
