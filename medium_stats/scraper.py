@@ -199,7 +199,7 @@ class StatGrabberBase:
             filepath = f"{filepath}.json"
 
         try:
-            data = json.dumps(data)
+            data = json.dumps(data, indent=2)
         except:
             traceback.print_exc()
         
