@@ -5,6 +5,7 @@ import configparser
 from inspect import cleandoc
 from medium_stats.utils import valid_date, make_utc_explicit
 from functools import partial
+from inspect import cleandoc
 
 USER_MODE_CHOICES = ['summary', 'events', 'articles', 'referrers']
 PUB_MODE_CHOICES = ['events', 'story_overview', 'articles', 'referrers']
@@ -81,15 +82,18 @@ def get_argparser():
     
     # PUBLICATION
     usage = '''\
-    medium-stats scrape_publication -u URL [--output_dir DIR] \
+    medium-stats scrape_publication -u USERNAME -s PUBLICATION_SLUG [--output_dir DIR] \
     (--creds PATH | (--sid SID --uid UID)) \
-    (--all | [--start PERIOD_START] [--end PERIOD END]) [--is-utc]\
+    (--all | [--start PERIOD_START] [--end PERIOD_END]) [--is-utc]\
     [--mode {events, story_overview, articles, referrers}]'''
     usage = usage.replace('    ', '')
 
     scrape_pub = subparser.add_parser('scrape_publication', usage=usage, help='get publication statistics')
-    # TODO - change help below
-    scrape_pub.add_argument('-u', metavar='URL', help='publication URL')
+    scrape_pub.add_argument('-u', metavar='USERNAME', help='your Medium username')
+    slug_msg = ''' 
+    publication slug, e.g. "publication-name" if url is "medium.com/publication-name"
+    '''
+    scrape_pub.add_argument('-s', metavar='PUBLICATION_SLUG', help=cleandoc(slug_msg))
     add_subarguments(scrape_pub)
     scrape_pub.add_argument('--mode', nargs='*', 
                         choices=PUB_MODE_CHOICES, default=PUB_MODE_CHOICES, 
@@ -138,6 +142,8 @@ def parse_scraper_args(args, parser):
     if args.end < args.start:
         parser.error('Period "--end" cannot be prior to "--start"')
     
+    args.s = f'medium.com/{args.s}'
+
     return args
 
 class MediumConfigHelper:

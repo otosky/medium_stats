@@ -209,7 +209,7 @@ def main():
                 write_stats(sg, data, 'summary', sg.now, sub_dir)
             
         else:
-            url = args.u
+            url = args.s
             sg = StatGrabberPublication(url, sid, uid, args.start, args.end, already_utc=True)
             folders = get_folders(pub_mode_attrs)
             sub_dir = create_directories(args.output_dir, sg.slug, folders)
