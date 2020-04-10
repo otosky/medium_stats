@@ -166,8 +166,8 @@ referrers = me.get_all_story_stats(articles, type_='referrer') # all-time referr
 #### FOR A PUBLICATION ####
 from medium_stats.scraper import StatGrabberPublication
 
-# url should be consistent with publication landing page
-pub = StatGrabberPublication('medium.com/test-publication', 'sid', 'uid', start, stop)
+# first argument should be your publication slug, i.e. what follows the URL after "medium.com/"
+pub = StatGrabberPublication('test-publication', 'sid', 'uid', start, stop)
 
 # get publication views & visitors (like the stats landing page)
 views = pub.get_events(type_='views')
