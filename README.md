@@ -103,17 +103,18 @@ $ medium-stats scrape_user -u [USERNAME] --all
 
 For a publication:
 ```bash
-$ medium-stats scrape_publication -u [URL] --all
+$ medium-stats scrape_publication -u [USERNAME] -s [SLUG] --all
 
-# Valid example urls: 
-# 'https://medium.com/test-publication', 'medium.com/test-publication', 
-# 'https://custom.subdomain.com', 'custom.subdomain.com'
+# The "slug" parameter is typically your publication's name in lower-case,
+# with spaces delimited by dashes, and is the portion of your page's URL after "medium.com/"
+# e.g. "test-publication" if the URL is https://medium.com/test-publication and name is "Test Publication"
+
 ```
 
 General Use pattern:
 ```bash
-medium-stats (scrape_user | scrape_publication) -u USERNAME/URL [--output_dir DIR] \
-(--creds PATH | (--sid SID --uid UID)) \
+medium-stats (scrape_user | scrape_publication) -u USERNAME/URL -s [PUBLICATION_SLUG]
+[--output_dir DIR] (--creds PATH | (--sid SID --uid UID)) \
 (--all | [--start PERIOD_START] [--end PERIOD END]) [--is-utc] \
 [--mode {summary, events, articles, referrers, story_overview}]
 ```
