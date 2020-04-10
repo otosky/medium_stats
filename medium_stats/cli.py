@@ -141,8 +141,6 @@ def parse_scraper_args(args, parser):
     # make sure start and end obey time-order
     if args.end < args.start:
         parser.error('Period "--end" cannot be prior to "--start"')
-    
-    args.s = f'medium.com/{args.s}'
 
     return args
 

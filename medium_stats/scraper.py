@@ -244,10 +244,9 @@ class StatGrabberUser(StatGrabberBase):
 
 class StatGrabberPublication(StatGrabberBase):
 
-    def __init__(self, url, sid, uid, start, stop, now=None, already_utc=False):
+    def __init__(self, slug, sid, uid, start, stop, now=None, already_utc=False):
         
-        if not re.search("^https://", url):
-            url = 'https://' + url
+        url = 'https://medium.com/' + slug
         self.url = url
         super().__init__(sid, uid, start, stop, now, already_utc)
         homepage = self._fetch(self.url)
@@ -261,6 +260,8 @@ class StatGrabberPublication(StatGrabberBase):
         create_endpoint = lambda x: collections_endpoint + x + timeframe
         self.views_endpoint = create_endpoint('views')
         self.visitors_endpoint = create_endpoint('visitors')
+
+    #TODO - create a helper classmethod that takes in a URL and extracts slug
 
     def _unpack_attrs(self, attrs_json):
 
