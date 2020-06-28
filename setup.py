@@ -15,7 +15,7 @@ setup(
             'medium-stats = medium_stats.__main__:main'
         ]
     },
-    packages=find_packages(exclude=("tests",)),
+    packages=find_packages(exclude=("test",)),
     python_requires='>=3.6',
     install_requires = ['requests', 'lxml'],
     extras_require={
