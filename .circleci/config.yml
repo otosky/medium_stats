@@ -20,6 +20,7 @@ jobs:
           name: Running tests
           command: |
             . venv/bin/activate
+            pwd
             python3 -m unittest discover
       - store_artifacts:
           path: test-reports/
