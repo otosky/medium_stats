@@ -54,7 +54,7 @@ class TestScrapeUserCLIArguments(unittest.TestCase):
     def test_period_set(self):
         
         # TODO - this hits error because creds path needs to be mocked
-        invalid_cred_explicit = 'scrape_user --creds path/to -u test_user'.split()
+        invalid_cred_explicit = 'scrape_user --creds ~/.medium_creds.ini -u test_user'.split()
         invalid_cred_implicit = 'scrape_user -u test_user'.split()
 
         invalids = [invalid_cred_explicit, invalid_cred_implicit]
