@@ -1,5 +1,5 @@
 # Medium Stats Scraper
-[![CircleCI](https://circleci.com/gh/otosky/medium_stats.svg?style=svg)](https://circleci.com/gh/otosky/medium_stats)
+[![CircleCI](https://circleci.com/gh/otosky/medium_stats.svg?style=shield)](https://circleci.com/gh/otosky/medium_stats)
 
 A command-line tool and Python package to fetch your Medium profile statistics 
 and save the data as JSON.
