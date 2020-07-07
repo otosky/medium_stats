@@ -306,3 +306,6 @@ cookies = MediumConfigHelper(config_path=default_creds, account_name='your_handl
 sid = cookies.sid
 uid = cookies.uid
 ```
+
+TODO:
+- Add story author and title to post stats
