@@ -1,5 +1,4 @@
 **/__pycache__/
-.vscode
 .ipynb_checkpoints/
 **/.ipynb_checkpoints/
 .DS_Store
@@ -23,3 +22,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# IDE
+.idea/
+.vscode/
