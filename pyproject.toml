@@ -2,8 +2,14 @@
 name = "medium_stats"
 version = "2.1.2"
 description = "CLI tool to fetch your Medium stats"
+readme = "README.md"
 authors = ["otosky <olivertosky@gmail.com>"]
 license = "GNU GPLv3"
+keywords = ["Medium", "blog", "scraper", "analytics"]
+include = ["LICENSE",]
+
+[tool.poetry.scripts]
+medium-stats = 'medium_stats.__main__:main'
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
