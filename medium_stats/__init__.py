@@ -1,1 +1,2 @@
-from .scraper import StatGrabberUser, StatGrabberPublication
+from .scraper import StatGrabberPublication
+from .scraper import StatGrabberUser
