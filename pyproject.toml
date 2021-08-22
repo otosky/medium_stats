@@ -7,6 +7,8 @@ authors = ["otosky <olivertosky@gmail.com>"]
 license = "GNU GPLv3"
 keywords = ["Medium", "blog", "scraper", "analytics"]
 include = ["LICENSE", ]
+homepage = "https://github.com/otosky/medium_stats"
+repository = "https://github.com/otosky/medium_stats"
 
 [tool.poetry.scripts]
 medium-stats = 'medium_stats.__main__:main'
