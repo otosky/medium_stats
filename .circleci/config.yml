@@ -41,7 +41,7 @@ jobs:
             source $HOME/.poetry/env
             touch ~/.medium_creds.ini
             cd test
-            python3 -m unittest
+            poetry run python -m unittest
       - store_artifacts:
           path: test-reports/
           destination: python_app
