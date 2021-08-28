@@ -23,15 +23,18 @@ jobs:
       - save_cache:
           key: deps-v1-{{ .Branch }}-{{ checksum "poetry.lock" }}
           paths:
-            # cache the virtual environment(s) generateed by poetry
             - /home/circleci/.cache/pypoetry/virtualenvs
-            # cache the vendored install of poetry itself
             - /home/circleci/.poetry
   test:
     docker:
       - image: circleci/python:3.6
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - deps-v1-{{ .Branch }}-{{ checksum "poetry.lock" }}
+            - deps-v1-{{ .Branch }}
+            - deps-v1
       - run:
           name: run tests
           command: |
