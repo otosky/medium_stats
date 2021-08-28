@@ -1,28 +1,89 @@
 version: 2
+
+executors:
+  basic:
+    docker:
+      - image: circleci/python:3.7.4
+    working_directory: ~/repo
+
 jobs:
   build:
     docker:
       - image: circleci/python:3.6
     steps:
       - checkout
-      #- restore_cache:
-      #    key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
+          name: install deps
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install .
-      #- save_cache:
-      #    key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
-      #    paths:
-      #      - "venv"
+            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --version 1.1.4
+            source $HOME/.poetry/env
+            poetry config experimental.new-installer false
+            poetry run pip install -U pip
+            poetry install
+          - save_cache:
+              key: deps-v1-{{ .Branch }}-{{ checksum "poetry.lock" }}
+              paths:
+                # cache the virtual environment(s) generateed by poetry
+                - /home/circleci/.cache/pypoetry/virtualenvs
+                # cache the vendored install of poetry itself
+                - /home/circleci/.poetry
+  test:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
       - run:
-          name: Running tests
+          name: run tests
           command: |
-            . venv/bin/activate
+            source $HOME/.poetry/env
             touch ~/.medium_creds.ini
             cd test
             python3 -m unittest
       - store_artifacts:
           path: test-reports/
           destination: python_app
+  publish:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run:
+          name: publish to pypi
+          command: |
+            poetry build
+            poetry publish
+#  bump:
+#    docker:
+#      - image: circleci/python:3.6
+#    steps:
+#      - checkout
+#      - run:
+#          name: Bump version
+#          command: |
+#            source $HOME/.poetry/env
+#            sudo apt-get update && sudo apt-get install -y git
+#            git config --global user.email ""
+#            git config --global user.name ""
+#            poetry version patch
+#            VERSION=$(poetry version -s)
+#            git commit -am "[skip ci] Bump version to ${VERSION} from CircleCI"
+#            git push origin master
+#            git tag -a ${VERSION} -m "${VERSION}"
+#            git push --follow-tags
+workflows:
+  test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+#      - bump:
+#          filters:
+#            branches:
+#              only:
+#                - master
+#      - publish:
+#          filters:
+#            branches:
+#              only:
+#                - master
