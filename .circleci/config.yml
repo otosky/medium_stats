@@ -20,13 +20,13 @@ jobs:
             poetry config experimental.new-installer false
             poetry run pip install -U pip
             poetry install
-          - save_cache:
-              key: deps-v1-{{ .Branch }}-{{ checksum "poetry.lock" }}
-              paths:
-                # cache the virtual environment(s) generateed by poetry
-                - /home/circleci/.cache/pypoetry/virtualenvs
-                # cache the vendored install of poetry itself
-                - /home/circleci/.poetry
+      - save_cache:
+          key: deps-v1-{{ .Branch }}-{{ checksum "poetry.lock" }}
+          paths:
+            # cache the virtual environment(s) generateed by poetry
+            - /home/circleci/.cache/pypoetry/virtualenvs
+            # cache the vendored install of poetry itself
+            - /home/circleci/.poetry
   test:
     docker:
       - image: circleci/python:3.6
@@ -71,6 +71,7 @@ jobs:
 #            git tag -a ${VERSION} -m "${VERSION}"
 #            git push --follow-tags
 workflows:
+  version: 2
   test:
     jobs:
       - build
