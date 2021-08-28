@@ -274,13 +274,7 @@ class StatGrabberPublication(StatGrabberBase):
             self.domain = self.attrs_json["domain"]
         except:
             self.domain = None
-        creation = self.attrs_json["metadata"]["activeAt"]
-        creation = datetime.fromtimestamp(creation / 1e3, timezone.utc)
-        # timestamps come in hourly buckets, so this is a safety mechanism
-        creation = creation - timedelta(hours=2)
-        if self.start < creation:
-            self.start = creation
-            self.start_unix = convert_datetime_to_unix(self.start)
+
 
     def __repr__(self):
         return f"{self.name} - {self.description}"

@@ -2,19 +2,30 @@
 name = "medium_stats"
 version = "2.1.2"
 description = "CLI tool to fetch your Medium stats"
+readme = "README.md"
 authors = ["otosky <olivertosky@gmail.com>"]
 license = "GNU GPLv3"
+keywords = ["Medium", "blog", "scraper", "analytics"]
+include = ["LICENSE", ]
+homepage = "https://github.com/otosky/medium_stats"
+repository = "https://github.com/otosky/medium_stats"
+
+[tool.poetry.scripts]
+medium-stats = 'medium_stats.__main__:main'
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
 requests = "^2.26.0"
 lxml = "^4.6.3"
-selenium = "^3.141.0"
-webdriver-manager = "^3.4.2"
+selenium = { version = "^3.141.0", optional = true }
+webdriver-manager = { version = "^3.4.2", optional = true }
 
 [tool.poetry.dev-dependencies]
 black = "^21.7b0"
 isort = "^5.9.3"
+
+[tool.poetry.extras]
+selenium = ["selenium", "webdriver-manager"]
 
 [tool.black]
 line-length = 120

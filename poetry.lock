@@ -75,7 +75,7 @@ name = "configparser"
 version = "5.0.2"
 description = "Updated configparser from Python 3.8 for Python 2.6+."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.extras]
@@ -87,7 +87,7 @@ name = "crayons"
 version = "0.4.0"
 description = "TextUI colors for Python."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -201,7 +201,7 @@ name = "selenium"
 version = "3.141.0"
 description = "Python bindings for Selenium"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -249,7 +249,7 @@ name = "webdriver-manager"
 version = "3.4.2"
 description = "Library provides the way to automatically manage drivers for different browsers"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -269,10 +269,13 @@ python-versions = ">=3.6"
 docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
+[extras]
+selenium = ["selenium", "webdriver-manager"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.2"
-content-hash = "b8c1edb6b292b3a504ad338e692a6847b461fb18447c965e75b6818f547eb71c"
+content-hash = "44d26b4a649846e2798a7422611573943188ddb5c1b739162f527054ac7cf848"
 
 [metadata.files]
 appdirs = [
