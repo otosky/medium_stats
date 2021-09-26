@@ -1,9 +1,6 @@
 import argparse
 import configparser
 import os
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
 from functools import partial
 from inspect import cleandoc
 
@@ -64,11 +61,6 @@ def get_argparser():
         )
 
         period_group = parser.add_argument_group("period")
-        period_group.add_argument(
-            "--all",
-            action="store_true",
-            help="full history since your first publication",
-        )
         period_group.add_argument("--start", type=valid_date, help="stats start date, format=YYYY-MM-DD")
         period_group.add_argument("--end", type=valid_date, help="stats end date, format=YYYY-MM-DD")
         period_group.add_argument("--is-utc", action="store_true", help="start/end times are in UTC")
@@ -104,7 +96,7 @@ def get_argparser():
     usage = """\
     medium-stats scrape_user -u USERNAME [--output_dir DIR] \
     (--creds PATH | (--sid SID --uid UID)) \
-    (--all | [--start PERIOD_START] [--end PERIOD END]) [--is-utc]\
+    ([--start PERIOD_START] [--end PERIOD END]) [--is-utc]\
     [--mode {summary, events, articles, referrers}]"""
     usage = usage.replace("    ", "")
 
@@ -124,7 +116,7 @@ def get_argparser():
     usage = """\
     medium-stats scrape_publication -u USERNAME -s PUBLICATION_SLUG [--output_dir DIR] \
     (--creds PATH | (--sid SID --uid UID)) \
-    (--all | [--start PERIOD_START] [--end PERIOD_END]) [--is-utc]\
+    ([--start PERIOD_START] [--end PERIOD_END]) [--is-utc]\
     [--mode {events, story_overview, articles, referrers}]"""
     usage = usage.replace("    ", "")
 
@@ -160,24 +152,6 @@ def parse_scraper_args(args, parser):
     if cookies_supplied:
         args.creds = None
 
-    if not bool(args.all or args.start or args.end):
-        parser.error('Period must be set as "--all" or a range with "--start" and/or "--stop" values')
-
-    if args.all:
-        if args.all and bool(args.start or args.end):
-            parser.error("""Can't use "--all" flag with "start" or "end" arguments""")
-        if args.all and args.is_utc:
-            parser.error("""Can't use "--all" flag with "--is-utc" flag""")
-        args.end = datetime.now(timezone.utc)
-        args.start = datetime(year=1999, month=1, day=1, tzinfo=timezone.utc)
-    else:
-        if bool(args.start or args.end):
-            if not args.end:
-                end = datetime.now(timezone.utc)
-                args.end = datetime(*end.timetuple()[:3]).replace(tzinfo=timezone.utc)
-            if not args.start:
-                start = args.end - timedelta(days=1)
-                args.start = datetime(*start.timetuple()[:3]).replace(tzinfo=timezone.utc)
 
     # convert to UTC here
     make_utc = partial(make_utc_explicit, utc_naive=args.is_utc)

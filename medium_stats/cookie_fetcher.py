@@ -85,6 +85,3 @@ class MediumAuthorizer:
         with open(path, "w") as f:
             config.write(f)
 
-
-if __name__ == "__main__":
-    pass

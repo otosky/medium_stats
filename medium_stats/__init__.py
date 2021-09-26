@@ -1,2 +1,2 @@
-from .scraper import StatGrabberPublication
-from .scraper import StatGrabberUser
+from medium_stats.scraper.publication import StatGrabberPublication
+from medium_stats.scraper.user import StatGrabberUser
