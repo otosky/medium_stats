@@ -3,4 +3,4 @@ fmt:
 	poetry run black --exclude .venv .
 
 test:
-	poetry run pytest -n auto
+	poetry run pytest
