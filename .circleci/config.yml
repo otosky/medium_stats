@@ -15,8 +15,7 @@ jobs:
       - run:
           name: install deps
           command: |
-            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --version 1.1.4
-            poetry self update
+            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --version 1.1.10
             source $HOME/.poetry/env
             poetry config experimental.new-installer false
             poetry run pip install -U pip
