@@ -1,35 +1,33 @@
 from datetime import datetime
 from datetime import timezone
 from importlib.util import find_spec
-from typing import Sequence, List
+from typing import List
+from typing import Sequence
+
+from typing_extensions import Type
 
 extras = ("selenium", "webdriver_manager")
 
 
-def check_dependencies_missing(extras: Sequence[str]=extras) -> List[str]:
-    dependencies = [bool(find_spec(e)) for e in extras]
-    if sum(dependencies) == len(extras):
-        return []
-
-    missing = [z[0] for z in zip(extras, dependencies) if not z[1]]
+def check_dependencies_missing(extras: Sequence[str] = extras) -> List[str]:
+    missing = [e for e in extras if not bool(find_spec(e))]
     return missing
 
 
-def valid_date(ds: str, error: Exception)-> datetime:
+def valid_date(ds: str, error: Type[Exception] = ValueError) -> datetime:
     if len(ds) > 10:
-        try:
-            dt = datetime.strptime(ds, "%Y-%m-%dT%H:%M:%S")
-            return dt
-        except ValueError:
-            msg = f"'{ds}' cannot be parsed as datetime - must be of form YYYY-MM-DDThh:mm:ss"
-            raise error(msg)
+        dt_format = "%Y-%m-%dT%H:%M:%S"
+        help_txt = "YYYY-MM-DDThh:mm:ss"
     else:
-        try:
-            dt = datetime.strptime(ds, "%Y-%m-%d")
-            return dt
-        except ValueError:
-            msg = f"'{ds}' cannot be parsed as datetime - must be of form YYYY-MM-DD"
-            raise error(msg)
+        dt_format = "%Y-%m-%d"
+        help_txt = "YYYY-MM-DD"
+
+    try:
+        dt = datetime.strptime(ds, dt_format)
+        return dt
+    except ValueError:
+        msg = f"'{ds}' cannot be parsed as datetime - must be of form {help_txt}"
+        raise error(msg)
 
 
 def dt_formatter(dt: datetime, output: str) -> str:
@@ -52,7 +50,7 @@ def make_utc_explicit(dt: datetime, utc_naive: bool) -> datetime:
     return dt.astimezone(timezone.utc)
 
 
-def convert_datetime_to_unix(dt: datetime, ms: bool=True) -> int:
+def convert_datetime_to_unix(dt: datetime, ms: bool = True) -> int:
 
     dt = dt.astimezone(timezone.utc)
     dt = int(dt.timestamp())

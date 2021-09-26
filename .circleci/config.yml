@@ -42,6 +42,7 @@ jobs:
             touch ~/.medium_creds.ini
             cd test
             poetry run python -m unittest
+            poetry run pytest -n auto
       - store_artifacts:
           path: test-reports/
           destination: python_app
