@@ -1,5 +1,7 @@
 from enum import Enum
 
+from medium_stats.utils import convert_datetime_to_unix
+
 
 class StatsPostQueries(Enum):
     CHART_Q = """\
@@ -90,3 +92,25 @@ class StatsPostQueries(Enum):
           __typename
         }
     """
+
+
+def get_chart_query(post_id, start, stop):
+    post_query = {
+        "operationName": "StatsPostChart",
+        "query": StatsPostQueries.CHART_Q.value,
+        "variables": {
+            "postId": post_id,
+            "startAt": convert_datetime_to_unix(start),
+            "endAt": convert_datetime_to_unix(stop),
+        },
+    }
+    return post_query
+
+
+def get_referrer_query(post_id):
+    post_query = {
+        "operationName": "StatsPostReferrersContainer",
+        "query": StatsPostQueries.REFERRER_Q.value,
+        "variables": {"postId": post_id},
+    }
+    return post_query

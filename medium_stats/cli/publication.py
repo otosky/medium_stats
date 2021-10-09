@@ -25,7 +25,7 @@ sg = lazy_object_proxy.Proxy(
 @publication_app.command(name="overview")
 def get_overview():
     """Lifetime summary view of all posts by Publication."""
-    data = sg.get_all_story_overview()
+    data = sg.get_summary_stats()
 
     typer.echo(fmt_json(data))
 

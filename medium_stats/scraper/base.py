@@ -7,8 +7,8 @@ from typing import List
 import requests
 from requests import Response
 
-from medium_stats.scraper.queries import StatsPostQueries
-from medium_stats.utils import convert_datetime_to_unix
+from medium_stats.scraper.queries import get_chart_query
+from medium_stats.scraper.queries import get_referrer_query
 
 
 class StatGrabberBase:
@@ -54,34 +54,29 @@ class StatGrabberBase:
 
     def get_referrer_totals(self, post_id):
 
-        post_data = {
-            "variables": {"postId": post_id},
-            "operationName": "StatsPostReferrersContainer",
-            "query": StatsPostQueries.REFERRER_Q.value,
-        }
-
-        response = self.session.post(self.gql_endpoint, json=post_data)
+        gql_query = get_referrer_query(post_id)
+        response = self.session.post(self.gql_endpoint, json=gql_query)
         response.raise_for_status()
 
-        return response.json()
+        return response.json()["data"]
+
+    def get_all_referrer_totals(self, post_ids):
+        return [self.get_referrer_totals(post_id) for post_id in post_ids]
 
     def get_view_read_totals(self, post_id, start, stop):
 
-        post_data = {
-            "operationName": "StatsPostChart",
-            "query": StatsPostQueries.CHART_Q.value,
-            "variables": {
-                "postId": post_id,
-                "startAt": convert_datetime_to_unix(start),
-                "endAt": convert_datetime_to_unix(stop),
-            },
-        }
-        response = self.session.post(self.gql_endpoint, json=post_data)
+        gql_query = get_chart_query(post_id, start, stop)
+        response = self.session.post(self.gql_endpoint, json=gql_query)
         response.raise_for_status()
 
-        return response.json()
+        return response.json()["data"]
 
-    def write_json(self, data: dict, filepath: str) -> Path:
+    def get_all_view_read_totals(self, post_ids, start, stop):
+        return [self.get_view_read_totals(post_id, start, stop) for post_id in post_ids]
+
+    # TODO fixme
+    @staticmethod
+    def write_json(data: dict, filepath: str) -> Path:
 
         if not re.search(".json$", filepath):
             filepath = f"{filepath}.json"
