@@ -1,62 +1,49 @@
-import json
 from datetime import datetime
 
 from medium_stats.scraper.base import StatGrabberBase
+from medium_stats.utils import convert_datetime_to_unix
 
 
 class StatGrabberPublication(StatGrabberBase):
-    def __init__(self, slug: str, sid: str, uid: str, start: datetime, stop: datetime, now=None, already_utc=False):
+    def __init__(self, slug: str, sid: str, uid: str):
+        super().__init__(sid, uid)
 
-        url = "https://medium.com/" + slug
-        self.url = url
-        super().__init__(sid, uid, start, stop, now, already_utc)
-        homepage = self._fetch(self.url)
-        # TODO figure out why requests lib doesn't get full html from this url
-        data = self._decode_json(homepage)
-        self.attrs_json = data["collection"]
-        self._unpack_attrs(self.attrs_json)
+        self.url = "https://medium.com/" + slug
+        homepage = self._fetch(self.url)  # TODO figure out why requests lib doesn't get full html from this url
+        data = self._get_json_payload(homepage)
+        self._attrs_json = data["collection"]
+        self._unpack_attrs(self._attrs_json)
 
-        collections_endpoint = f"https://medium.com/_/api/collections/{self.id}/stats/"
-        timeframe = f"?from={self.start_unix}&to={self.stop_unix}"
-        create_endpoint = lambda x: collections_endpoint + x + timeframe
-        self.views_endpoint = create_endpoint("views")
-        self.visitors_endpoint = create_endpoint("visitors")
+        self.collections_endpoint = f"https://medium.com/_/api/collections/{self.id}/stats"
 
-    # TODO - create a helper classmethod that takes in a URL and extracts slug
+    def _unpack_attrs(self, attrs_json: dict):
 
-    def _unpack_attrs(self, attrs_json):
-
-        self.id = self.attrs_json["id"]
-        self.slug = self.attrs_json["slug"]
-        self.name = self.attrs_json["name"]
-        self.creator = self.attrs_json["creatorId"]
-        self.description = self.attrs_json["description"]
+        self.id = attrs_json["id"]
+        self.slug = attrs_json["slug"]
+        self.name = attrs_json["name"]
+        self.creator = attrs_json["creatorId"]
+        self.description = attrs_json["description"]
         try:
-            self.domain = self.attrs_json["domain"]
-        except:
+            self.domain = self._attrs_json["domain"]
+        except KeyError:
             self.domain = None
 
-    def __repr__(self):
-        return f"{self.name} - {self.description}"
+    def get_events(self, start: datetime, stop: datetime, type_: str):
+        url = "/".join([self.collections_endpoint, type_])
+        params = {"from": convert_datetime_to_unix(start), "to": convert_datetime_to_unix(stop)}
 
-    def get_events(self, type_: str = "views") -> dict:
-
-        if type_ == "views":
-            response = self._fetch(self.views_endpoint)
-        elif type_ == "visitors":
-            response = self._fetch(self.visitors_endpoint)
-        else:
-            raise ValueError('"type_" param must be either "views" or "visitors"')
-
-        data = self._decode_json(response)
-
+        response = self._fetch(url, params=params)
+        data = self._get_json_payload(response)
         return data["value"]
 
-    def get_all_story_overview(self):
+    def get_summary_stats(self):
 
         # TODO: need to figure out how pagination works after limit exceeded
         endpoint = f"https://medium.com/{self.slug}/stats/stories?limit=50"
         response = self._fetch(endpoint)
-        data = self._decode_json(response)
+        data = self._get_json_payload(response)
 
         return data["value"]
+
+    def __repr__(self):  # pragma: no cover
+        return f"{self.name} - {self.description}"

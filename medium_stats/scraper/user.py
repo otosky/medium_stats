@@ -7,34 +7,26 @@ from medium_stats.utils import convert_datetime_to_unix
 
 
 class StatGrabberUser(StatGrabberBase):
-    def __init__(self, username, sid, uid, start, stop, now=None, already_utc=False):
-
+    def __init__(self, username: str, sid: str, uid: str):
+        super().__init__(sid, uid)
         self.username = str(username)
-        self.slug = str(username)
-        super().__init__(sid, uid, start, stop, now, already_utc)
-        # TODO: find a test User with many more posts to see how to deal with pagination
-        self.stats_url = f"https://medium.com/@{username}/stats?filter=not-response&limit=50"
-        self.totals_endpoint = f"https://medium.com/@{username}/stats/total/{self.start_unix}/{self.stop_unix}"
 
     def __repr__(self):
         return f"username: {self.username} // uid: {self.uid}"
 
-    def get_summary_stats(self, events=False):
+    def get_events(self, start: datetime, stop: datetime):
+        url_prefix = f"https://medium.com/@{self.username}/stats/total"
+        start_ts, stop_ts = map(convert_datetime_to_unix, (start, stop))
+        url = f"{url_prefix}/{start_ts}/{stop_ts}"
 
-        if events:
-            response = self._fetch(self.totals_endpoint)
-        else:
-            response = self._fetch(self.stats_url)
+        response = self._fetch(url)
 
-        data = self._decode_json(response)
+        data = self._get_json_payload(response)
+        return data["value"]
 
-        # reset period "start" to when user created Medium account, if init
-        # setting is prior
-        if not events:
-            user_creation = data["references"]["User"][self.uid]["createdAt"]
-            user_creation = datetime.fromtimestamp(user_creation / 1e3, timezone.utc)
-            if self.start < user_creation:
-                self.start = user_creation
-                self.start_unix = convert_datetime_to_unix(self.start)
+    def get_summary_stats(self):
+        url = f"https://medium.com/@{self.username}/stats?filter=not-response&limit=50"
+        response = self._fetch(url)
 
+        data = self._get_json_payload(response)
         return data["value"]
