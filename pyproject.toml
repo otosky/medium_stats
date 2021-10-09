@@ -12,11 +12,14 @@ repository = "https://github.com/otosky/medium_stats"
 
 [tool.poetry.scripts]
 medium-stats = 'medium_stats.__main__:main'
+medium-stats2 = 'medium_stats.cli.main:app'
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
 requests = "^2.26.0"
 lxml = "^4.6.3"
+typer = "*"
+lazy-object-proxy= "*"
 selenium = { version = "^3.141.0", optional = true }
 webdriver-manager = { version = "^3.4.2", optional = true }
 
