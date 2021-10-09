@@ -28,3 +28,6 @@ var/
 .vscode/
 
 .env
+
+# pytest
+.pytest_cache/
