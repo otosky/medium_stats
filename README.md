@@ -29,7 +29,7 @@ needs **two** cookies from a signed-in Medium session - "sid" and "uid".
 - Scroll through the cookies for medium.com until you find 'sid' and 'uid'
 
 
-![](readme_extras/cookie_howto.gif)
+![cookie_howto](https://user-images.githubusercontent.com/42260747/136667306-0fb9cc54-301d-4712-a4a6-1b063ad9fc83.gif)
 
 Create a `.medium_creds.ini` file to hold these cookie values:
 
