@@ -22,7 +22,7 @@ def get_summary():
     typer.echo(fmt_json(data))
 
 
-@publication_app.command(name="event-views")
+@publication_app.command(name="events-views")
 def get_view_events(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPER):
     sg = StatGrabberPublication(**publication_config.as_dict())
     data = sg.get_events(start, stop, type_="views")
