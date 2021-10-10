@@ -13,8 +13,8 @@ from medium_stats.config import publication_config
 publication_app = typer.Typer()
 
 
-@publication_app.command(name="overview")
-def get_overview():
+@publication_app.command(name="summary")
+def get_summary():
     """Lifetime summary view of all posts by Publication."""
     sg = StatGrabberPublication(**publication_config.as_dict())
     data = sg.get_summary_stats()

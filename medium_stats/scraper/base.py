@@ -24,12 +24,12 @@ class StatGrabberBase:
 
     def _setup_requests(self):
 
-        s = requests.Session()
-        s.headers.update({"content-type": "application/json", "accept": "application/json"})
+        session = requests.Session()
+        session.headers.update({"content-type": "application/json", "accept": "application/json"})
 
         cookies = requests.utils.cookiejar_from_dict(self.cookies)
-        s.cookies = cookies
-        self.session = s
+        session.cookies = cookies
+        self.session = session
 
     def _fetch(self, url, params=None) -> Response:
 

@@ -4,7 +4,7 @@ from medium_stats.cli.main import app
 
 runner = CliRunner()
 
-CLI_GROUPS = {"scrape_user", "scrape_publication"}
+CLI_GROUPS = {"scrape-user", "scrape-publication"}
 
 
 def test_cli_groups_are_registered():

@@ -15,7 +15,7 @@ runner = CliRunner()
 @pytest.mark.parametrize(
     "to_patch,mocked_data,cli_command",
     [
-        ("get_summary_stats", mock_story_summary_stats, ("overview",)),
+        ("get_summary_stats", mock_story_summary_stats, ("summary",)),
         ("get_events", mock_events__views, ("views", "2021-10-05", "2021-10-06")),
         ("get_events", mock_events__visitors, ("visitors", "2021-10-05", "2021-10-06")),
     ],

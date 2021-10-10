@@ -25,7 +25,7 @@ def get_summary():
     typer.echo(fmt_json(post_stats))
 
 
-@user_app.command(name="events")
+@user_app.command(name="views")
 def get_events(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPER):
     sg = StatGrabberUser(**user_config.as_dict())
     events = sg.get_events(start, stop)

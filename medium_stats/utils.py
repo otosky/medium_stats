@@ -52,7 +52,7 @@ def make_utc_explicit(dt: datetime, utc_naive: bool) -> datetime:
 
 def convert_datetime_to_unix(dt: datetime, ms: bool = True) -> int:
 
-    dt = dt.astimezone(timezone.utc)
+    dt = dt.replace(tzinfo=timezone.utc)
     dt = int(dt.timestamp())
 
     if ms:

@@ -5,8 +5,8 @@ from medium_stats.cli.user import user_app
 
 app = typer.Typer()
 
-app.add_typer(user_app, name="scrape_user")
-app.add_typer(publication_app, name="scrape_publication")
+app.add_typer(user_app, name="scrape-user")
+app.add_typer(publication_app, name="scrape-publication")
 
 
 if __name__ == "__main__":  # pragma: no cover
