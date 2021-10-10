@@ -1,5 +1,7 @@
 import json
 from datetime import datetime
+from typing import List
+from typing import Union
 
 import typer
 
@@ -7,7 +9,7 @@ START_ARG_TYPER = typer.Argument(..., help="Date range start; %Y-%m-%d or %Y-%m-
 STOP_ARG_TYPER = typer.Argument(..., help="Date range end (exclusive); %Y-%m-%d or %Y-%m-%dT%H:%M:%S", metavar="STOP")
 
 
-def fmt_json(data: dict):
+def fmt_json(data: Union[List[dict], dict]):
     return json.dumps(data, indent=2, default=str)
 
 

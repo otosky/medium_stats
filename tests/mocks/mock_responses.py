@@ -21,11 +21,13 @@ def mock_homepage(domain=True):
 
 
 def mock_chart_response_body():
-    return json.dumps(mock_article_daily_view_reads()).encode()
+    payload = {"data": {"post": mock_article_daily_view_reads()}}
+    return json.dumps(payload).encode()
 
 
 def mock_referrer_response_body():
-    return json.dumps(mock_referrer_totals()).encode()
+    payload = {"data": {"post": mock_referrer_totals()}}
+    return json.dumps(payload).encode()
 
 
 def mock_views():

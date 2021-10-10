@@ -1,7 +1,4 @@
 import json
-import re
-import traceback
-from pathlib import Path
 from typing import List
 
 import requests
@@ -46,7 +43,7 @@ class StatGrabberBase:
         cleaned = response.text.replace("])}while(1);</x>", "")
         return json.loads(cleaned)["payload"]
 
-    def get_article_ids(self, summary_stats_json: dict) -> List[str]:
+    def get_article_ids(self, summary_stats_json: List[dict]) -> List[str]:
 
         ids = [a["postId"] for a in summary_stats_json]
         self.articles = ids
@@ -58,7 +55,7 @@ class StatGrabberBase:
         response = self.session.post(self.gql_endpoint, json=gql_query)
         response.raise_for_status()
 
-        return response.json()["data"]
+        return response.json()["data"]["post"]
 
     def get_all_referrer_totals(self, post_ids):
         return [self.get_referrer_totals(post_id) for post_id in post_ids]
@@ -69,24 +66,24 @@ class StatGrabberBase:
         response = self.session.post(self.gql_endpoint, json=gql_query)
         response.raise_for_status()
 
-        return response.json()["data"]
+        return response.json()["data"]["post"]
 
     def get_all_view_read_totals(self, post_ids, start, stop):
         return [self.get_view_read_totals(post_id, start, stop) for post_id in post_ids]
 
-    # TODO fixme
-    @staticmethod
-    def write_json(data: dict, filepath: str) -> Path:
-
-        if not re.search(".json$", filepath):
-            filepath = f"{filepath}.json"
-
-        try:
-            data = json.dumps(data, indent=2)
-        except:
-            traceback.print_exc()
-
-        with open(filepath, "w") as f:
-            f.write(data)
-
-        return Path(filepath)
+    # # TODO fixme
+    # @staticmethod
+    # def write_json(data: dict, filepath: str) -> Path:
+    #
+    #     if not re.search(".json$", filepath):
+    #         filepath = f"{filepath}.json"
+    #
+    #     try:
+    #         data = json.dumps(data, indent=2)
+    #     except:
+    #         traceback.print_exc()
+    #
+    #     with open(filepath, "w") as f:
+    #         f.write(data)
+    #
+    #     return Path(filepath)

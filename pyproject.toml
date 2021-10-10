@@ -11,21 +11,23 @@ homepage = "https://github.com/otosky/medium_stats"
 repository = "https://github.com/otosky/medium_stats"
 
 [tool.poetry.scripts]
-medium-stats = 'medium_stats.__main__:main'
-medium-stats2 = 'medium_stats.cli.main:app'
+medium-stats = 'medium_stats.cli.main:app'
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
 requests = "^2.26.0"
 lxml = "^4.6.3"
 typer = "*"
-lazy-object-proxy= "*"
+lazy-object-proxy = "*"
 selenium = { version = "^3.141.0", optional = true }
 webdriver-manager = { version = "^3.4.2", optional = true }
 
 [tool.poetry.dev-dependencies]
-pytest = "*"
 python-dotenv = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-dotenv = "*"
+pytest-mock = "*"
 responses = "*"
 black = "^21.7b0"
 isort = "^5.9.3"
@@ -45,6 +47,19 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 120
 skip = ["venv", ".venv"]
+
+
+[tool.coverage.run]
+omit = [
+    "tests/*",
+    ".venv/*",
+    "medium_stats/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -9,5 +9,5 @@ app.add_typer(user_app, name="scrape_user")
 app.add_typer(publication_app, name="scrape_publication")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     app()

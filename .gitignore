@@ -31,3 +31,5 @@ var/
 
 # pytest
 .pytest_cache/
+.coverage
+htmlcov/

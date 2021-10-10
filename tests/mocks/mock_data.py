@@ -1,79 +1,71 @@
 def mock_article_daily_view_reads():
     return {
-        "data": {
-            "post": {
-                "__typename": "Post",
-                "dailyStats": [
-                    {
-                        "__typename": "DailyPostStat",
-                        "internalReferrerViews": 6,
-                        "memberTtr": 170,
-                        "periodStartedAt": 1633392000000,
-                        "views": 30,
-                    },
-                ],
-                "earnings": {
-                    "__typename": "PostEarnings",
-                    "dailyEarnings": [],
-                    "lastCommittedPeriodStartedAt": 1633651200000,
-                },
-                "id": "id-string",
-            }
-        }
+        "__typename": "Post",
+        "dailyStats": [
+            {
+                "__typename": "DailyPostStat",
+                "internalReferrerViews": 6,
+                "memberTtr": 170,
+                "periodStartedAt": 1633392000000,
+                "views": 30,
+            },
+        ],
+        "earnings": {
+            "__typename": "PostEarnings",
+            "dailyEarnings": [],
+            "lastCommittedPeriodStartedAt": 1633651200000,
+        },
+        "id": "id-string",
     }
 
 
 def mock_referrer_totals():
     return {
-        "data": {
-            "post": {
-                "__typename": "Post",
-                "id": "id-string",
-                "referrers": [
-                    {
-                        "__typename": "Referrer",
-                        "internal": None,
-                        "platform": "TWITTER",
-                        "postId": "id-string",
-                        "search": None,
-                        "site": None,
-                        "sourceIdentifier": "twitter.com",
-                        "totalCount": 50,
-                        "type": "PLATFORM",
-                    },
-                    {
-                        "__typename": "Referrer",
-                        "internal": None,
-                        "platform": None,
-                        "postId": "id-string",
-                        "search": None,
-                        "site": None,
-                        "sourceIdentifier": "direct",
-                        "totalCount": 11,
-                        "type": "DIRECT",
-                    },
-                    {
-                        "__typename": "Referrer",
-                        "internal": {
-                            "__typename": "InternalReferrer",
-                            "collectionId": None,
-                            "postId": None,
-                            "profileId": None,
-                            "type": "HOMEPAGE",
-                        },
-                        "platform": None,
-                        "postId": "id-string",
-                        "search": None,
-                        "site": None,
-                        "sourceIdentifier": "domain.com",
-                        "totalCount": 8,
-                        "type": "INTERNAL",
-                    },
-                ],
-                "title": "In Defense of the Untidy Data Table",
-                "totalStats": {"__typename": "SummaryPostStat", "views": 100},
-            }
-        }
+        "__typename": "Post",
+        "id": "id-string",
+        "referrers": [
+            {
+                "__typename": "Referrer",
+                "internal": None,
+                "platform": "TWITTER",
+                "postId": "id-string",
+                "search": None,
+                "site": None,
+                "sourceIdentifier": "twitter.com",
+                "totalCount": 50,
+                "type": "PLATFORM",
+            },
+            {
+                "__typename": "Referrer",
+                "internal": None,
+                "platform": None,
+                "postId": "id-string",
+                "search": None,
+                "site": None,
+                "sourceIdentifier": "direct",
+                "totalCount": 11,
+                "type": "DIRECT",
+            },
+            {
+                "__typename": "Referrer",
+                "internal": {
+                    "__typename": "InternalReferrer",
+                    "collectionId": None,
+                    "postId": None,
+                    "profileId": None,
+                    "type": "HOMEPAGE",
+                },
+                "platform": None,
+                "postId": "id-string",
+                "search": None,
+                "site": None,
+                "sourceIdentifier": "domain.com",
+                "totalCount": 8,
+                "type": "INTERNAL",
+            },
+        ],
+        "title": "In Defense of the Untidy Data Table",
+        "totalStats": {"__typename": "SummaryPostStat", "views": 100},
     }
 
 
