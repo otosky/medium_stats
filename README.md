@@ -43,7 +43,7 @@ Note: if grabbing statistics for a publication add `MEDIUM_PUBLICATION_SLUG=<slu
 The "slug" parameter is typically your publication's name in lower-case, with spaces delimited by dashes, and is the
 portion of your page's URL after "medium.com/"
 
-For example, `test-publication` if the URL is https://medium.com/test-publication and name is "Test Publication"
+For example, the slug is `test-publication` if the URL is https://medium.com/test-publication and name is "Test Publication"
 
 ---
 
@@ -55,7 +55,6 @@ For example, `test-publication` if the URL is https://medium.com/test-publicatio
 
 ```python
 from datetime import datetime
-from datetime import timezone
 from medium_stats import StatGrabberUser
 from medium_stats import UserConfig
 
