@@ -21,7 +21,7 @@ runner = CliRunner()
     ],
 )
 def test_get_summary(mocker, to_patch, mocked_data, cli_command):
-    mock = mocker.patch(f"medium_stats.cli.publication.sg.{to_patch}", return_value=mocked_data())
+    mock = mocker.patch(f"medium_stats.cli.publication.StatGrabberPublication.{to_patch}", return_value=mocked_data())
     result = runner.invoke(publication_app, [*cli_command])
     assert mock.called
 
@@ -38,9 +38,9 @@ def test_get_summary(mocker, to_patch, mocked_data, cli_command):
 )
 def test_get_stats_for_all_articles(mocker, to_patch, mocked_data, cli_command):
 
-    mocker.patch(f"medium_stats.cli.publication.sg.get_summary_stats")
-    mocker.patch(f"medium_stats.cli.publication.sg.get_article_ids", return_value=["id-string"])
-    mock = mocker.patch(f"medium_stats.cli.publication.sg.{to_patch}", return_value=mocked_data())
+    mocker.patch(f"medium_stats.cli.publication.StatGrabberPublication.get_summary_stats")
+    mocker.patch(f"medium_stats.cli.publication.StatGrabberPublication.get_article_ids", return_value=["id-string"])
+    mock = mocker.patch(f"medium_stats.cli.publication.StatGrabberPublication.{to_patch}", return_value=mocked_data())
     result = runner.invoke(publication_app, [*cli_command])
     assert mock.called
 

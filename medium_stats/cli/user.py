@@ -10,16 +10,16 @@ from medium_stats.cli.core import STOP_ARG_TYPER
 from medium_stats.cli.core import _get_articles
 from medium_stats.cli.core import _get_referrers
 from medium_stats.cli.core import fmt_json
-from medium_stats.cli.core import user_config
+from medium_stats.config import user_config
 
 user_app = typer.Typer()
 
-sg = lazy_object_proxy.Proxy(lambda: StatGrabberUser(**user_config.as_dict()))
 
 
 @user_app.command(name="summary")
 def get_summary():
     """Lifetime stats per post."""
+    sg = StatGrabberUser(**user_config.as_dict())
     post_stats = sg.get_summary_stats()
 
     typer.echo(fmt_json(post_stats))
@@ -27,6 +27,7 @@ def get_summary():
 
 @user_app.command(name="events")
 def get_events(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPER):
+    sg = StatGrabberUser(**user_config.as_dict())
     events = sg.get_events(start, stop)
 
     typer.echo(fmt_json(events))
@@ -34,11 +35,13 @@ def get_events(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPE
 
 @user_app.command(name="articles")
 def get_articles(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPER):
+    sg = StatGrabberUser(**user_config.as_dict())
     data = _get_articles(sg, start, stop)
     typer.echo(fmt_json(data))
 
 
 @user_app.command(name="referrers")
 def get_referrers():
+    sg = StatGrabberUser(**user_config.as_dict())
     data = _get_referrers(sg)
     typer.echo(fmt_json(data))

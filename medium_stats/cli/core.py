@@ -5,52 +5,10 @@ from datetime import datetime
 from typing import List
 from typing import Union
 
-import dotenv
-import lazy_object_proxy
 import typer
 
 START_ARG_TYPER = typer.Argument(..., help="Date range start; %Y-%m-%d or %Y-%m-%dT%H:%M:%S", metavar="START")
 STOP_ARG_TYPER = typer.Argument(..., help="Date range end (exclusive); %Y-%m-%d or %Y-%m-%dT%H:%M:%S", metavar="STOP")
-
-
-@dataclass
-class PublicationConfig:
-    sid: str
-    uid: str
-    slug: str
-
-    @staticmethod
-    def from_env():
-        dotenv.load_dotenv()
-        return PublicationConfig(
-            sid=os.environ["MEDIUM_SID"], uid=os.environ["MEDIUM_UID"], slug=os.environ["MEDIUM_PUBLICATION_SLUG"]
-        )
-
-    def as_dict(self):
-        return self.__dict__
-
-
-publication_config = lazy_object_proxy.Proxy(lambda: PublicationConfig.from_env())
-
-
-@dataclass
-class UserConfig:
-    sid: str
-    uid: str
-    username: str
-
-    @staticmethod
-    def from_env():
-        dotenv.load_dotenv()
-        return UserConfig(
-            sid=os.environ["MEDIUM_SID"], uid=os.environ["MEDIUM_UID"], username=os.environ["MEDIUM_USERNAME"]
-        )
-
-    def as_dict(self):
-        return self.__dict__
-
-
-user_config = lazy_object_proxy.Proxy(lambda: UserConfig.from_env())
 
 
 def fmt_json(data: Union[List[dict], dict]):
