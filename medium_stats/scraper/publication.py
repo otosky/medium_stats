@@ -9,12 +9,16 @@ class StatGrabberPublication(StatGrabberBase):
         super().__init__(sid, uid)
 
         self.url = "https://medium.com/" + slug
-        homepage = self._fetch(self.url)  # TODO figure out why requests lib doesn't get full html from this url
-        data = self._get_json_payload(homepage)
+
+        data = self._get_homepage_data()
         self._attrs_json = data["collection"]
         self._unpack_attrs(self._attrs_json)
 
         self.collections_endpoint = f"https://medium.com/_/api/collections/{self.id}/stats"
+
+    def _get_homepage_data(self):
+        homepage = self._fetch(self.url)  # TODO figure out why requests lib doesn't get full html from this url
+        return self._get_json_payload(homepage)
 
     def _unpack_attrs(self, attrs_json: dict):
 
