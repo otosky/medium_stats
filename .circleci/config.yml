@@ -39,9 +39,6 @@ jobs:
           name: run tests
           command: |
             source $HOME/.poetry/env
-            touch ~/.medium_creds.ini
-            cd test
-            poetry run python -m unittest
             poetry run pytest
       - store_artifacts:
           path: test-reports/
