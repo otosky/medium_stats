@@ -48,46 +48,7 @@ EOF
 #e.g. "olivertosky" from https://medium.com/@olivertosky
 ```
 
-***
-
-*If you want to automatically find and store your cookies:*
-
-```bash
-$ pip install medium-stats[selenium]
-```
-
-This installs some extra dependencies allowing a webscraper to authenticate to Medium
-on your behalf and grab your "sid" and "uid" cookies.  *Note: You must already have 
-Chrome installed.*
-
-Currently only valid for Gmail OAuth:
-
-```bash
-$ medium-stats fetch_cookies -u [HANDLE] --email [EMAIL] --pwd [PASSWORD]
-
-# Or specify that your password should be pulled from an environment variable:
-$ export MEDIUM_AUTH_PWD='[PASSWORD]'
-$ medium-stats fetch_cookies -u [HANDLE] --email [EMAIL] --pwd-in-env
-```
-
-### Step 2 - *Optional*:
-
-Create a directory for your stats exports; the CLI tool will run 
-under the working directory by default.
-
-```bash
-$ mkdir path_to_target_stats_directory
-```
-
-Once executed the CLI tool will create the following directory structure:
-```
-target_stats_directory/
-    stats_exports/
-        [HANDLE]/
-            agg_stats/ 
-            agg_events/ 
-            post_events/
-            post_referrers/
+---
 ```
 
 ## Usage
@@ -235,76 +196,59 @@ i.e. they don't take into account "start" & "stop" parameters.
 
 `article_events`:
 ```
-{'data': {
-    'post': [{
-        '__typename': 'Post',
-        'dailyStats': [
-            {   '__typename': 'DailyPostStat',
-                'internalReferrerViews': 1,
-                'memberTtr': 119,
-                'periodStartedAt': 1583452800000,
-                'views': 8},
-            ... 
-            {   '__typename': 'DailyPostStat',
-                'internalReferrerViews': 5,
-                'memberTtr': 375,
-                'periodStartedAt': 1583539200000,
-                'views': 40}],
-        'earnings': {
-            '__typename': 'PostEarnings',
-            'dailyEarnings': [],
-            'lastCommittedPeriodStartedAt': 1585526400000},
-        'id': 'ARTICLE_ID'},
-        ...
-    ]}
-}
+ [{
+  '__typename': 'Post',
+  'dailyStats': [
+    {'__typename': 'DailyPostStat',
+     'internalReferrerViews': 1,
+     'memberTtr': 119,
+     'periodStartedAt': 1583452800000,
+     'views': 8},
+    ...
+    {'__typename': 'DailyPostStat',
+     'internalReferrerViews': 5,
+     'memberTtr': 375,
+     'periodStartedAt': 1583539200000,
+     'views': 40}],
+  'earnings': {
+    '__typename': 'PostEarnings',
+    'dailyEarnings': [],
+    'lastCommittedPeriodStartedAt': 1585526400000},
+  'id': 'ARTICLE_ID'},
+  ...
+]}
 ```
 
 `referrers`:
 ```
-{'data': {'post': [{'__typename': 'Post',
-                    'id': 'POST_ID',
-                    'referrers': [{'__typename': 'Referrer',
-                                   'internal': None,
-                                   'platform': None,
-                                   'postId': 'POST_ID',
-                                   'search': None,
-                                   'site': None,
-                                   'sourceIdentifier': 'direct',
-                                   'totalCount': 222,
-                                   'type': 'DIRECT'},
-                                  ...
-                                  {'__typename': 'Referrer',
-                                   'internal': None,
-                                   'platform': None,
-                                   'postId': 'POST_ID',
-                                   'search': None,
-                                   'site': {'__typename': 'SiteReferrer',
-                                            'href': 'https://www.inoreader.com/',
-                                            'title': None},
-                                   'sourceIdentifier': 'inoreader.com',
-                                   'totalCount': 1,
-                                   'type': 'SITE'}],
-                    'title': 'TITLE_HERE',
-                    'totalStats': {'__typename': 'SummaryPostStat',
-                                   'views': 395}},
-                    ...
-                   ]
-            }
-}
-```
-
-> If you set up your credentials file already, there is a helper class `MediumConfigHelper`,
-that wraps the standard `configparser`:
-```python
-import os
-from medium_stats.cli import MediumConfigHelper
-
-default_creds = os.path.join(os.path.expanduser('~'), '.medium_creds.ini')
-
-cookies = MediumConfigHelper(config_path=default_creds, account_name='your_handle')
-sid = cookies.sid
-uid = cookies.uid
+[{'__typename': 'Post',
+  'id': 'POST_ID',
+  'referrers': [{'__typename': 'Referrer',
+                 'internal': None,
+                 'platform': None,
+                 'postId': 'POST_ID',
+                 'search': None,
+                 'site': None,
+                 'sourceIdentifier': 'direct',
+                 'totalCount': 222,
+                 'type': 'DIRECT'},
+                ...
+                {'__typename': 'Referrer',
+                 'internal': None,
+                 'platform': None,
+                 'postId': 'POST_ID',
+                 'search': None,
+                 'site': {'__typename': 'SiteReferrer',
+                          'href': 'https://www.inoreader.com/',
+                          'title': None},
+                 'sourceIdentifier': 'inoreader.com',
+                 'totalCount': 1,
+                 'type': 'SITE'}],
+  'title': 'TITLE_HERE',
+  'totalStats': {'__typename': 'SummaryPostStat',
+                 'views': 395}},
+  ...
+ ]
 ```
 
 TODO:
