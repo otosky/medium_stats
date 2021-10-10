@@ -39,6 +39,19 @@ class UserConfig:
     uid: str
     username: str
 
+    @staticmethod
+    def from_env():
+        dotenv.load_dotenv()
+        return UserConfig(
+            sid=os.environ["MEDIUM_SID"], uid=os.environ["MEDIUM_UID"], username=os.environ["MEDIUM_USERNAME"]
+        )
+
+    def as_dict(self):
+        return self.__dict__
+
+
+user_config = lazy_object_proxy.Proxy(lambda: UserConfig.from_env())
+
 
 def fmt_json(data: Union[List[dict], dict]):
     return json.dumps(data, indent=2, default=str)

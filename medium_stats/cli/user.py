@@ -10,16 +10,11 @@ from medium_stats.cli.core import STOP_ARG_TYPER
 from medium_stats.cli.core import _get_articles
 from medium_stats.cli.core import _get_referrers
 from medium_stats.cli.core import fmt_json
+from medium_stats.cli.core import user_config
 
 user_app = typer.Typer()
 
-sg = lazy_object_proxy.Proxy(
-    lambda: StatGrabberUser(
-        username=os.environ["MEDIUM_USERNAME"],
-        sid=os.environ["MEDIUM_SID"],
-        uid=os.environ["MEDIUM_UID"],
-    )
-)
+sg = lazy_object_proxy.Proxy(lambda: StatGrabberUser(**user_config.as_dict()))
 
 
 @user_app.command(name="summary")
