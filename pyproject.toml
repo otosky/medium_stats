@@ -14,7 +14,7 @@ repository = "https://github.com/otosky/medium_stats"
 medium-stats = 'medium_stats.cli.main:app'
 
 [tool.poetry.dependencies]
-python = "^3.6.2"
+python = "^3.7"
 requests = "^2.26.0"
 lxml = "^4.6.3"
 typer = "*"

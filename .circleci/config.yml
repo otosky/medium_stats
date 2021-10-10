@@ -1,15 +1,14 @@
 version: 2
 
 executors:
-  basic:
+  basic_python:
     docker:
-      - image: circleci/python:3.7.4
+      - image: cimg/python:3.7.10
     working_directory: ~/repo
 
 jobs:
   build:
-    docker:
-      - image: circleci/python:3.6
+    executor: basic_python
     steps:
       - checkout
       - run:
@@ -26,8 +25,7 @@ jobs:
             - /home/circleci/.cache/pypoetry/virtualenvs
             - /home/circleci/.poetry
   test:
-    docker:
-      - image: circleci/python:3.6
+    executor: basic_python
     steps:
       - checkout
       - restore_cache:
@@ -44,8 +42,7 @@ jobs:
           path: test-reports/
           destination: python_app
   publish:
-    docker:
-      - image: circleci/python:3.6
+    executor: basic_python
     steps:
       - checkout
       - run:
@@ -54,8 +51,7 @@ jobs:
             poetry build
             poetry publish
 #  bump:
-#    docker:
-#      - image: circleci/python:3.6
+#    executor: basic_python
 #    steps:
 #      - checkout
 #      - run:
