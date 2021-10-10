@@ -92,18 +92,6 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
-name = "configparser"
-version = "5.0.2"
-description = "Updated configparser from Python 3.8 for Python 2.6+."
-category = "main"
-optional = true
-python-versions = ">=3.6"
-
-[package.extras]
-docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "pytest-black (>=0.3.7)", "pytest-mypy"]
-
-[[package]]
 name = "coverage"
 version = "6.0.1"
 description = "Code coverage measurement for Python"
@@ -116,17 +104,6 @@ tomli = {version = "*", optional = true, markers = "extra == \"toml\""}
 
 [package.extras]
 toml = ["tomli"]
-
-[[package]]
-name = "crayons"
-version = "0.4.0"
-description = "TextUI colors for Python."
-category = "main"
-optional = true
-python-versions = "*"
-
-[package.dependencies]
-colorama = "*"
 
 [[package]]
 name = "idna"
@@ -372,17 +349,6 @@ urllib3 = ">=1.25.10"
 tests = ["coverage (>=3.7.1,<6.0.0)", "pytest-cov", "pytest-localserver", "flake8", "types-mock", "types-requests", "types-six", "pytest (>=4.6,<5.0)", "pytest (>=4.6)", "mypy"]
 
 [[package]]
-name = "selenium"
-version = "3.141.0"
-description = "Python bindings for Selenium"
-category = "main"
-optional = true
-python-versions = "*"
-
-[package.dependencies]
-urllib3 = "*"
-
-[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -453,19 +419,6 @@ secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "cer
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
-name = "webdriver-manager"
-version = "3.4.2"
-description = "Library provides the way to automatically manage drivers for different browsers"
-category = "main"
-optional = true
-python-versions = ">=3.6"
-
-[package.dependencies]
-configparser = "*"
-crayons = "*"
-requests = "*"
-
-[[package]]
 name = "zipp"
 version = "3.5.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -477,13 +430,10 @@ python-versions = ">=3.6"
 docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
-[extras]
-selenium = ["selenium", "webdriver-manager"]
-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "fffbe7bcd14e2246e2a53ba6bed4fc95d17bc6e8086dd028845fcff69861908c"
+content-hash = "13f11d930de874522ba2966c9c660d8728230cb7e6124dcd8260935e40c6c8e8"
 
 [metadata.files]
 appdirs = [
@@ -517,10 +467,6 @@ click = [
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
-]
-configparser = [
-    {file = "configparser-5.0.2-py3-none-any.whl", hash = "sha256:af59f2cdd7efbdd5d111c1976ecd0b82db9066653362f0962d7bf1d3ab89a1fa"},
-    {file = "configparser-5.0.2.tar.gz", hash = "sha256:85d5de102cfe6d14a5172676f09d19c465ce63d6019cf0a4ef13385fc535e828"},
 ]
 coverage = [
     {file = "coverage-6.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:abe8207dfb8a61ded9cd830d26c1073c8218fc0ae17eb899cfe8ec0fafae6e22"},
@@ -556,10 +502,6 @@ coverage = [
     {file = "coverage-6.0.1-pp36-none-any.whl", hash = "sha256:65da6e3e8325291f012921bbf71fea0a97824e1c573981871096aac6e2cf0ec5"},
     {file = "coverage-6.0.1-pp37-none-any.whl", hash = "sha256:07efe1fbd72e67df026ad5109bcd216acbbd4a29d5208b3dab61779bae6b7b26"},
     {file = "coverage-6.0.1.tar.gz", hash = "sha256:3490ff6dbf3f7accf0750136ed60ae1f487bccc1f097740e3b21262bc9c89854"},
-]
-crayons = [
-    {file = "crayons-0.4.0-py2.py3-none-any.whl", hash = "sha256:e73ad105c78935d71fe454dd4b85c5c437ba199294e7ffd3341842bc683654b1"},
-    {file = "crayons-0.4.0.tar.gz", hash = "sha256:bd33b7547800f2cfbd26b38431f9e64b487a7de74a947b0fafc89b45a601813f"},
 ]
 idna = [
     {file = "idna-3.2-py3-none-any.whl", hash = "sha256:14475042e284991034cb48e06f6851428fb14c4dc953acd9be9a5e95c7b6dd7a"},
@@ -744,10 +686,6 @@ responses = [
     {file = "responses-0.14.0-py2.py3-none-any.whl", hash = "sha256:57bab4e9d4d65f31ea5caf9de62095032c4d81f591a8fac2f5858f7777b8567b"},
     {file = "responses-0.14.0.tar.gz", hash = "sha256:93f774a762ee0e27c0d9d7e06227aeda9ff9f5f69392f72bb6c6b73f8763563e"},
 ]
-selenium = [
-    {file = "selenium-3.141.0-py2.py3-none-any.whl", hash = "sha256:2d7131d7bc5a5b99a2d9b04aaf2612c411b03b8ca1b1ee8d3de5845a9be2cb3c"},
-    {file = "selenium-3.141.0.tar.gz", hash = "sha256:deaf32b60ad91a4611b98d8002757f29e6f2c2d5fcaf202e1c9ad06d6772300d"},
-]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
@@ -804,10 +742,6 @@ typing-extensions = [
 urllib3 = [
     {file = "urllib3-1.26.6-py2.py3-none-any.whl", hash = "sha256:39fb8672126159acb139a7718dd10806104dec1e2f0f6c88aab05d17df10c8d4"},
     {file = "urllib3-1.26.6.tar.gz", hash = "sha256:f57b4c16c62fa2760b7e3d97c35b255512fb6b59a259730f36ba32ce9f8e342f"},
-]
-webdriver-manager = [
-    {file = "webdriver_manager-3.4.2-py2.py3-none-any.whl", hash = "sha256:50a6e174106542f5335cacc387cec7ada26812babc1aeca61c208a1bab2ac2c5"},
-    {file = "webdriver_manager-3.4.2.tar.gz", hash = "sha256:c6d81590aae6fc0fb10cf7dd20c8c1b9bb043501f9cf62c316a854a0de841e32"},
 ]
 zipp = [
     {file = "zipp-3.5.0-py3-none-any.whl", hash = "sha256:957cfda87797e389580cb8b9e3870841ca991e2125350677b2ca83a0e99390a3"},
