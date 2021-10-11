@@ -1,8 +1,10 @@
 from datetime import datetime
 from datetime import timezone
 from importlib.util import find_spec
+from typing import Callable
 from typing import List
 from typing import Sequence
+from typing import Set
 
 from typing_extensions import Type
 
@@ -59,3 +61,17 @@ def convert_datetime_to_unix(dt: datetime, ms: bool = True) -> int:
         dt = dt * 1000
 
     return dt
+
+
+def filter_by_key(predicate: Callable[[str], bool], dict_: dict) -> dict:
+    """Filters a dictionary for items where key meets predicate - taken from `toolz`."""
+    filtered = {}
+    for k, v in dict_.items():
+        if predicate(k):
+            filtered[k] = v
+    return filtered
+
+
+def select_keys(keys: Set, dict_: dict) -> dict:
+    """Filters a dictionary to only contain items where key in set `keys`."""
+    return filter_by_key(lambda key: key in keys, dict_)

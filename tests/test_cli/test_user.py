@@ -3,6 +3,7 @@ from typer.testing import CliRunner
 
 from medium_stats.cli.core import fmt_json
 from medium_stats.cli.user import user_app
+from medium_stats.utils import select_keys
 from tests.mocks.mock_data import mock_article_daily_view_reads
 from tests.mocks.mock_data import mock_events__views
 from tests.mocks.mock_data import mock_referrer_totals
@@ -44,3 +45,13 @@ def test_get_stats_for_all_articles(mocker, to_patch, mocked_data, cli_command):
 
     assert result.exit_code == 0
     assert result.stdout == fmt_json([mocked_data()]) + "\n"
+
+def test_get_article_ids(mocker):
+    summary_data =mock_story_summary_stats()
+    mock = mocker.patch(f"medium_stats.cli.user.StatGrabberUser.get_summary_stats", return_value=summary_data)
+    result = runner.invoke(user_app, ["get-article-ids"])
+    assert mock.called
+
+    assert result.exit_code == 0
+    expected_data = [select_keys({"postId", "title"}, post) for post in summary_data]
+    assert result.stdout == fmt_json(expected_data) + "\n"

@@ -8,6 +8,7 @@ from medium_stats.utils import check_dependencies_missing
 from medium_stats.utils import convert_datetime_to_unix
 from medium_stats.utils import dt_formatter
 from medium_stats.utils import make_utc_explicit
+from medium_stats.utils import select_keys
 from medium_stats.utils import valid_date
 
 
@@ -85,3 +86,8 @@ class TestConvertDatetimeToUnix:
     def test_when_ms_is_false(self):
         dt = datetime.fromtimestamp(1, tz=timezone.utc)
         assert convert_datetime_to_unix(dt, ms=False) == 1
+
+
+def test_select_keys():
+    d = {"id": 1, "name": "Joe", "age": 100}
+    assert select_keys({"id", "name"}, d) == {"id": 1, "name": "Joe"}

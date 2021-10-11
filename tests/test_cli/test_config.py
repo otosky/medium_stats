@@ -1,7 +1,8 @@
 import pytest
 
-from medium_stats.config import PublicationConfig, get_env_var_or_raise
+from medium_stats.config import PublicationConfig
 from medium_stats.config import UserConfig
+from medium_stats.config import get_env_var_or_raise
 
 
 class TestEnvVarOrRaise:
@@ -12,6 +13,7 @@ class TestEnvVarOrRaise:
     def test_raises_key_error(self):
         with pytest.raises(KeyError):
             get_env_var_or_raise("FOO")
+
 
 class TestPublicationConfig:
     def test_from_env(self, monkeypatch):

@@ -11,9 +11,9 @@ from medium_stats.cli.core import _get_articles
 from medium_stats.cli.core import _get_referrers
 from medium_stats.cli.core import fmt_json
 from medium_stats.config import user_config
+from medium_stats.utils import select_keys
 
 user_app = typer.Typer()
-
 
 
 @user_app.command(name="summary")
@@ -44,4 +44,12 @@ def get_articles(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TY
 def get_referrers():
     sg = StatGrabberUser(**user_config.as_dict())
     data = _get_referrers(sg)
+    typer.echo(fmt_json(data))
+
+
+@user_app.command(name="get-article-ids")
+def get_article_ids():
+    sg = StatGrabberUser(**user_config.as_dict())
+    articles = sg.get_summary_stats()
+    data = [select_keys({"postId", "title"}, article) for article in articles]
     typer.echo(fmt_json(data))

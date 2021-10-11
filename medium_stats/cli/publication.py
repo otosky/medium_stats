@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 import typer
 
@@ -9,6 +10,7 @@ from medium_stats.cli.core import _get_articles
 from medium_stats.cli.core import _get_referrers
 from medium_stats.cli.core import fmt_json
 from medium_stats.config import publication_config
+from medium_stats.utils import select_keys
 
 publication_app = typer.Typer()
 
@@ -39,9 +41,12 @@ def get_visitor_events(start: datetime = START_ARG_TYPER, stop: datetime = STOP_
 
 
 @publication_app.command(name="articles")
-def get_articles(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPER):
+def get_articles(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPER, post_id: Optional[str] = None):
     sg = StatGrabberPublication(**publication_config.as_dict())
-    data = _get_articles(sg, start, stop)
+    if post_id:
+        data = sg.get_view_read_totals(post_id, start, stop)
+    else:
+        data = _get_articles(sg, start, stop)
     typer.echo(fmt_json(data))
 
 
@@ -49,4 +54,12 @@ def get_articles(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TY
 def get_referrers():
     sg = StatGrabberPublication(**publication_config.as_dict())
     data = _get_referrers(sg)
+    typer.echo(fmt_json(data))
+
+
+@publication_app.command(name="get-article-ids")
+def get_article_ids():
+    sg = StatGrabberPublication(**publication_config.as_dict())
+    articles = sg.get_summary_stats()
+    data = [select_keys({"postId", "title"}, article) for article in articles]
     typer.echo(fmt_json(data))

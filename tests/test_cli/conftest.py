@@ -4,7 +4,8 @@ import responses
 
 # from medium_stats import StatGrabberPublication
 from medium_stats import StatGrabberUser
-from medium_stats.config import PublicationConfig, UserConfig
+from medium_stats.config import PublicationConfig
+from medium_stats.config import UserConfig
 from tests.mocks.mock_responses import mock_homepage
 
 
