@@ -19,9 +19,9 @@ requests = "^2.26.0"
 lxml = "^4.6.3"
 typer = "*"
 lazy-object-proxy = "*"
+python-dotenv = "*"
 
 [tool.poetry.dev-dependencies]
-python-dotenv = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-dotenv = "*"
