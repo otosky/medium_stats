@@ -34,6 +34,11 @@ def test_get_summary(mocker, to_patch, mocked_data, cli_command):
     "to_patch,mocked_data,cli_command",
     [
         ("get_view_read_totals", mock_article_daily_view_reads, ("articles", "2021-10-05", "2021-10-06")),
+        (
+            "get_view_read_totals",
+            mock_article_daily_view_reads,
+            ("articles", "--post-id", "id-string", "2021-10-05", "2021-10-06"),
+        ),
         ("get_referrer_totals", mock_referrer_totals, ("referrers",)),
     ],
 )
