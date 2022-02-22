@@ -40,12 +40,16 @@ class StatGrabberPublication(StatGrabberBase):
         data = self._get_json_payload(response)
         return data["value"]
 
-    def get_summary_stats(self):
+    def get_summary_stats(self, limit=50, **kwargs):
+        params = {"limit": limit, **kwargs}
+        url = f"{self.url}/stats/stories"
+        response = self._fetch(url, params=params)
 
-        # TODO: need to figure out how pagination works after limit exceeded
-        endpoint = f"https://medium.com/{self.slug}/stats/stories?limit=50"
-        response = self._fetch(endpoint)
         data = self._get_json_payload(response)
+        if data.get("paging", {}).get("next"):
+            next_cursor_idx = data["paging"]["next"]["to"]
+            next_page = self.get_summary_stats(limit=limit, to=next_cursor_idx)
+            data["value"].extend(next_page)
 
         return data["value"]
 

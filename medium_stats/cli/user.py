@@ -17,10 +17,10 @@ user_app = typer.Typer()
 
 
 @user_app.command(name="summary")
-def get_summary():
+def get_summary(limit: int = 50):
     """Lifetime stats per post."""
     sg = StatGrabberUser(**user_config.as_dict())
-    post_stats = sg.get_summary_stats()
+    post_stats = sg.get_summary_stats(limit=limit)
 
     typer.echo(fmt_json(post_stats))
 

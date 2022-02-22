@@ -40,6 +40,8 @@ def mock_visitors():
     return format_mock_response_body(payload)
 
 
-def mock_summary_stats():
+def mock_summary_stats(paginated=False):
     payload = {"value": mock_story_summary_stats()}
+    if paginated:
+        payload["paging"] = {"next": {"limit": 50, "to": "1585958916509", "bucketType": None, "filter": "not-response"}}
     return format_mock_response_body(payload)

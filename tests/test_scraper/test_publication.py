@@ -1,4 +1,6 @@
 from datetime import datetime
+from itertools import chain
+from itertools import repeat
 
 import pytest
 import responses
@@ -60,10 +62,18 @@ def test_get_events_views(event_type, mock_body, expected_keys, publication_conf
 
 def test_get_summary_stats(publication_config, responses_fixture):
     sg = StatGrabberPublication(**publication_config)
-    responses_fixture.add(
-        responses.GET, f"https://medium.com/{sg.slug}/stats/stories?limit=50", body=mock_summary_stats()
-    )
+    responses_fixture.add(responses.GET, f"{sg.url}/stats/stories", body=mock_summary_stats())
     data = sg.get_summary_stats()
 
     assert isinstance(data, list)
     assert data == mock_story_summary_stats()
+
+
+def test_get_summary_stats_paginated(publication_config, responses_fixture):
+    sg = StatGrabberPublication(**publication_config)
+    responses_fixture.add(responses.GET, f"{sg.url}/stats/stories", body=mock_summary_stats(paginated=True))
+    responses_fixture.add(responses.GET, f"{sg.url}/stats/stories", body=mock_summary_stats(paginated=False))
+    data = sg.get_summary_stats(limit=1)
+
+    assert isinstance(data, list)
+    assert data == list(chain.from_iterable(repeat(mock_story_summary_stats(), 2)))

@@ -46,8 +46,9 @@ def test_get_stats_for_all_articles(mocker, to_patch, mocked_data, cli_command):
     assert result.exit_code == 0
     assert result.stdout == fmt_json([mocked_data()]) + "\n"
 
+
 def test_get_article_ids(mocker):
-    summary_data =mock_story_summary_stats()
+    summary_data = mock_story_summary_stats()
     mock = mocker.patch(f"medium_stats.cli.user.StatGrabberUser.get_summary_stats", return_value=summary_data)
     result = runner.invoke(user_app, ["get-article-ids"])
     assert mock.called

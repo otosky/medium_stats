@@ -1,4 +1,6 @@
 from datetime import datetime
+from itertools import chain
+from itertools import repeat
 
 import responses
 
@@ -30,8 +32,19 @@ def test_get_events(user_config):
 @responses.activate
 def test_get_summary_stats(user_config):
     sg = StatGrabberUser(**user_config)
-    responses.add(responses.GET, sg._summary_stats_url, body=mock_summary_stats())
+    responses.add(responses.GET, sg._base_url, body=mock_summary_stats())
     data = sg.get_summary_stats()
 
     assert isinstance(data, list)
     assert data == mock_story_summary_stats()
+
+
+@responses.activate
+def test_get_summary_stats_paginated(user_config):
+    sg = StatGrabberUser(**user_config)
+    responses.add(responses.GET, sg._base_url, body=mock_summary_stats(paginated=True))
+    responses.add(responses.GET, sg._base_url, body=mock_summary_stats(paginated=False))
+    data = sg.get_summary_stats(limit=1)
+
+    assert isinstance(data, list)
+    assert data == list(chain.from_iterable(repeat(mock_story_summary_stats(), 2)))

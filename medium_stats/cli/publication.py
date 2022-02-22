@@ -16,10 +16,10 @@ publication_app = typer.Typer()
 
 
 @publication_app.command(name="summary")
-def get_summary():
+def get_summary(limit: int = 50):
     """Lifetime summary view of all posts by Publication."""
     sg = StatGrabberPublication(**publication_config.as_dict())
-    data = sg.get_summary_stats()
+    data = sg.get_summary_stats(limit=limit)
 
     typer.echo(fmt_json(data))
 
