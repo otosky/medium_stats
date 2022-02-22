@@ -210,13 +210,13 @@ class StatGrabberBase:
 
 
 class StatGrabberUser(StatGrabberBase):
-    def __init__(self, username, sid, uid, start, stop, now=None, already_utc=False):
+    def __init__(self, username, sid, uid, start, stop, now=None, already_utc=False, limit=50):
 
         self.username = str(username)
         self.slug = str(username)
         super().__init__(sid, uid, start, stop, now, already_utc)
         # TODO: find a test User with many more posts to see how to deal with pagination
-        self.stats_url = f"https://medium.com/@{username}/stats?filter=not-response&limit=50"
+        self.stats_url = f"https://medium.com/@{username}/stats?filter=not-response&limit={limit}"
         self.totals_endpoint = f"https://medium.com/@{username}/stats/total/{self.start_unix}/{self.stop_unix}"
 
     def __repr__(self):
@@ -292,10 +292,10 @@ class StatGrabberPublication(StatGrabberBase):
 
         return data["value"]
 
-    def get_all_story_overview(self):
+    def get_all_story_overview(self, limit=50):
 
         # TODO: need to figure out how pagination works after limit exceeded
-        endpoint = f"https://medium.com/{self.slug}/stats/stories?limit=50"
+        endpoint = f"https://medium.com/{self.slug}/stats/stories?limit={limit}"
         response = self._fetch(endpoint)
         data = self._decode_json(response)
 
