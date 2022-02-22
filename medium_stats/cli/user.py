@@ -23,6 +23,7 @@ def get_summary(limit: int = 50):
     post_stats = sg.get_summary_stats(limit=limit)
 
     typer.echo(fmt_json(post_stats))
+    return post_stats
 
 
 @user_app.command(name="events")
@@ -31,6 +32,7 @@ def get_events(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TYPE
     events = sg.get_events(start, stop)
 
     typer.echo(fmt_json(events))
+    return events
 
 
 @user_app.command(name="articles")
@@ -38,13 +40,14 @@ def get_articles(start: datetime = START_ARG_TYPER, stop: datetime = STOP_ARG_TY
     sg = StatGrabberUser(**user_config.as_dict())
     data = _get_articles(sg, start, stop)
     typer.echo(fmt_json(data))
-
+    return data
 
 @user_app.command(name="referrers")
 def get_referrers():
     sg = StatGrabberUser(**user_config.as_dict())
     data = _get_referrers(sg)
     typer.echo(fmt_json(data))
+    return data
 
 
 @user_app.command(name="get-article-ids")
@@ -53,3 +56,4 @@ def get_article_ids():
     articles = sg.get_summary_stats()
     data = [select_keys({"postId", "title"}, article) for article in articles]
     typer.echo(fmt_json(data))
+    return data
