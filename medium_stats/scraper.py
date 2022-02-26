@@ -133,9 +133,9 @@ class StatGrabberBase:
         s.cookies = cookies
         self.session = s
 
-    def _fetch(self, url):
+    def _fetch(self, url, params=None):
 
-        response = self.session.get(url)
+        response = self.session.get(url, params=params)
         response.raise_for_status()
         return response
 
@@ -210,35 +210,30 @@ class StatGrabberBase:
 
 
 class StatGrabberUser(StatGrabberBase):
-    def __init__(self, username, sid, uid, start, stop, now=None, already_utc=False, limit=50):
+    def __init__(self, username, sid, uid, start, stop, now=None, already_utc=False):
 
         self.username = str(username)
         self.slug = str(username)
         super().__init__(sid, uid, start, stop, now, already_utc)
-        # TODO: find a test User with many more posts to see how to deal with pagination
-        self.stats_url = f"https://medium.com/@{username}/stats?filter=not-response&limit={limit}"
+        self.stats_url = f"https://medium.com/@{username}/stats"
         self.totals_endpoint = f"https://medium.com/@{username}/stats/total/{self.start_unix}/{self.stop_unix}"
 
     def __repr__(self):
         return f"username: {self.username} // uid: {self.uid}"
 
-    def get_summary_stats(self, events=False):
-
+    def get_summary_stats(self, events=False, limit=50, **kwargs):
+        params = {"filter": "not-response", "limit": limit, **kwargs}
         if events:
             response = self._fetch(self.totals_endpoint)
         else:
-            response = self._fetch(self.stats_url)
+            response = self._fetch(self.stats_url, params=params)
 
         data = self._decode_json(response)
 
-        # reset period "start" to when user created Medium account, if init
-        # setting is prior
-        if not events:
-            user_creation = data["references"]["User"][self.uid]["createdAt"]
-            user_creation = datetime.fromtimestamp(user_creation / 1e3, timezone.utc)
-            if self.start < user_creation:
-                self.start = user_creation
-                self.start_unix = convert_datetime_to_unix(self.start)
+        if data.get("paging", {}).get("next"):
+            next_cursor_idx = data["paging"]["next"]["to"]
+            next_page = self.get_summary_stats(limit=limit, to=next_cursor_idx)
+            data["value"].extend(next_page)
 
         return data["value"]
 
@@ -275,7 +270,6 @@ class StatGrabberPublication(StatGrabberBase):
         except:
             self.domain = None
 
-
     def __repr__(self):
         return f"{self.name} - {self.description}"
 
@@ -292,11 +286,15 @@ class StatGrabberPublication(StatGrabberBase):
 
         return data["value"]
 
-    def get_all_story_overview(self, limit=50):
+    def get_all_story_overview(self, limit=50, **kwargs):
+        params = {"limit": limit, **kwargs}
+        endpoint = f"https://medium.com/{self.slug}/stats/stories"
+        response = self._fetch(endpoint, params)
 
-        # TODO: need to figure out how pagination works after limit exceeded
-        endpoint = f"https://medium.com/{self.slug}/stats/stories?limit={limit}"
-        response = self._fetch(endpoint)
         data = self._decode_json(response)
+        if data.get("paging", {}).get("next"):
+            next_cursor_idx = data["paging"]["next"]["to"]
+            next_page = self.get_all_story_overview(limit=limit, to=next_cursor_idx)
+            data["value"].extend(next_page)
 
         return data["value"]
