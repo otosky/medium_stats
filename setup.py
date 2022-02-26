@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="medium-stats",
-    version="2.1.2",
+    version="2.2.0",
     entry_points={"console_scripts": ["medium-stats = medium_stats.__main__:main"]},
     packages=find_packages(exclude=("test",)),
     python_requires=">=3.6",
