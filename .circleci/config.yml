@@ -1,33 +1,28 @@
-version: 2
+version: 2.1
 
 executors:
   basic:
     docker:
-      - image: circleci/python:3.7.4
+      - image: cimg/python:3.7.4
     working_directory: ~/repo
 
 jobs:
   build:
-    docker:
-      - image: circleci/python:3.6
+    executor: basic
     steps:
       - checkout
       - run:
           name: install deps
           command: |
-            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --version 1.1.4
-            source $HOME/.poetry/env
-            poetry config experimental.new-installer false
+            poetry self update 1.1.12
             poetry run pip install -U pip
             poetry install
       - save_cache:
           key: deps-v1-{{ .Branch }}-{{ checksum "poetry.lock" }}
           paths:
             - /home/circleci/.cache/pypoetry/virtualenvs
-            - /home/circleci/.poetry
   test:
-    docker:
-      - image: circleci/python:3.6
+    executor: basic
     steps:
       - checkout
       - restore_cache:
@@ -38,7 +33,6 @@ jobs:
       - run:
           name: run tests
           command: |
-            source $HOME/.poetry/env
             touch ~/.medium_creds.ini
             cd test
             poetry run python -m unittest
