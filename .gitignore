@@ -27,3 +27,7 @@ var/
 # IDE
 .idea/
 .vscode/
+
+htmlcov/*
+
+.env
