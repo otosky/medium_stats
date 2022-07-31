@@ -37,7 +37,6 @@ jobs:
           name: run tests
           command: |
             touch ~/.medium_creds.ini
-            cd test
             poetry run coverage run -m unittest discover
             poetry run coverage report -m
       - store_artifacts:
