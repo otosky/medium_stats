@@ -42,7 +42,7 @@ line_length = 120
 skip = ["venv", ".venv"]
 
 [tool.coverage.run]
-omit = ["test/*"]
+omit = ["*/test/*"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
