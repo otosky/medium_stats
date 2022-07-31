@@ -42,6 +42,7 @@ jobs:
       - store_artifacts:
           path: test-reports/
           destination: python_app
+      - codecov/upload
   publish:
     docker:
       - image: circleci/python:3.6
@@ -60,7 +61,6 @@ workflows:
       - test:
           requires:
             - build
-      - codecov/upload
 #      - publish:
 #          filters:
 #            branches:
