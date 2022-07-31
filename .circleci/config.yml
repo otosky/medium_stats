@@ -38,10 +38,15 @@ jobs:
           command: |
             touch ~/.medium_creds.ini
             cd test
-            poetry run python -m unittest
+            poetry run coverage run -m unittest discover
+      - run:
+          name: run coverage report
+          command: |
+            poetry run coverage report -m
       - store_artifacts:
           path: test-reports/
           destination: python_app
+
       - codecov/upload
   publish:
     docker:
