@@ -52,24 +52,6 @@ jobs:
           command: |
             poetry build
             poetry publish
-#  bump:
-#    docker:
-#      - image: circleci/python:3.6
-#    steps:
-#      - checkout
-#      - run:
-#          name: Bump version
-#          command: |
-#            source $HOME/.poetry/env
-#            sudo apt-get update && sudo apt-get install -y git
-#            git config --global user.email ""
-#            git config --global user.name ""
-#            poetry version patch
-#            VERSION=$(poetry version -s)
-#            git commit -am "[skip ci] Bump version to ${VERSION} from CircleCI"
-#            git push origin master
-#            git tag -a ${VERSION} -m "${VERSION}"
-#            git push --follow-tags
 workflows:
   version: 2
   test:
@@ -79,11 +61,6 @@ workflows:
           requires:
             - build
       - codecov/upload
-#      - bump:
-#          filters:
-#            branches:
-#              only:
-#                - master
 #      - publish:
 #          filters:
 #            branches:
