@@ -28,6 +28,7 @@ var/
 .idea/
 .vscode/
 
+.coverage
 htmlcov/*
 
 .env
