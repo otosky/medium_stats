@@ -38,6 +38,7 @@ jobs:
           command: |
             touch ~/.medium_creds.ini
             poetry run pytest --cov
+            coverage xml
       - run:
           command: ls
       - codecov/upload
