@@ -39,8 +39,6 @@ jobs:
             touch ~/.medium_creds.ini
             poetry run pytest --cov
             poetry run coverage xml
-      - run:
-          command: ls
       - codecov/upload
   publish:
     docker:
@@ -65,4 +63,3 @@ workflows:
 #            branches:
 #              only:
 #                - master
-
