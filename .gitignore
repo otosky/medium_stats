@@ -27,3 +27,10 @@ var/
 # IDE
 .idea/
 .vscode/
+
+.coverage
+coverage.json
+coverage.xml
+htmlcov/*
+
+.env
