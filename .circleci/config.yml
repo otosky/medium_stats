@@ -4,14 +4,13 @@ orbs:
   codecov: codecov/codecov@3.1
 
 executors:
-  basic:
+  basic_python:
     docker:
-      - image: cimg/python:3.7.4
+      - image: cimg/python:3.7.10
     working_directory: ~/repo
-
 jobs:
   build:
-    executor: basic
+    executor: basic_python
     steps:
       - checkout
       - run:
@@ -25,7 +24,7 @@ jobs:
           paths:
             - /home/circleci/.cache/pypoetry/virtualenvs
   test:
-    executor: basic
+    executor: basic_python
     steps:
       - checkout
       - restore_cache:
@@ -41,8 +40,7 @@ jobs:
             poetry run coverage xml
       - codecov/upload
   publish:
-    docker:
-      - image: circleci/python:3.6
+    executor: basic_python
     steps:
       - checkout
       - run:
