@@ -1,6 +1,7 @@
 # Medium Stats Scraper
 
 [![CircleCI](https://circleci.com/gh/otosky/medium_stats.svg?style=shield)](https://circleci.com/gh/otosky/medium_stats)
+[![codecov](https://codecov.io/gh/otosky/medium_stats/branch/master/graph/badge.svg?token=BUSIS9UAAG)](https://codecov.io/gh/otosky/medium_stats)
 
 A command-line tool and Python lib to fetch your Medium profile/publication statistics.
 

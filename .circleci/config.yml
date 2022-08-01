@@ -1,4 +1,8 @@
 version: 2.1
+
+orbs:
+  codecov: codecov/codecov@3.1
+
 executors:
   basic_python:
     docker:
@@ -12,16 +16,13 @@ jobs:
       - run:
           name: install deps
           command: |
-            curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --version 1.1.10
-            source $HOME/.poetry/env
-            poetry config experimental.new-installer false
+            poetry self update 1.1.12
             poetry run pip install -U pip
             poetry install
       - save_cache:
           key: deps-v1-{{ .Branch }}-{{ checksum "poetry.lock" }}
           paths:
             - /home/circleci/.cache/pypoetry/virtualenvs
-            - /home/circleci/.poetry
   test:
     executor: basic_python
     steps:
@@ -34,11 +35,10 @@ jobs:
       - run:
           name: run tests
           command: |
-            source $HOME/.poetry/env
-            poetry run pytest
-      - store_artifacts:
-          path: test-reports/
-          destination: python_app
+            touch ~/.medium_creds.ini
+            poetry run pytest --cov
+            poetry run coverage xml
+      - codecov/upload
   publish:
     executor: basic_python
     steps:
@@ -48,23 +48,6 @@ jobs:
           command: |
             poetry build
             poetry publish
-#  bump:
-#    executor: basic_python
-#    steps:
-#      - checkout
-#      - run:
-#          name: Bump version
-#          command: |
-#            source $HOME/.poetry/env
-#            sudo apt-get update && sudo apt-get install -y git
-#            git config --global user.email ""
-#            git config --global user.name ""
-#            poetry version patch
-#            VERSION=$(poetry version -s)
-#            git commit -am "[skip ci] Bump version to ${VERSION} from CircleCI"
-#            git push origin master
-#            git tag -a ${VERSION} -m "${VERSION}"
-#            git push --follow-tags
 workflows:
   version: 2
   test:
@@ -73,11 +56,6 @@ workflows:
       - test:
           requires:
             - build
-#      - bump:
-#          filters:
-#            branches:
-#              only:
-#                - master
 #      - publish:
 #          filters:
 #            branches:
