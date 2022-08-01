@@ -40,6 +40,8 @@ jobs:
             poetry run coverage run -m unittest discover
             poetry run coverage report -m
             poetry run coverage json
+      - run:
+          command: ls
       - store_artifacts:
           path: test-reports/
           destination: python_app
