@@ -29,6 +29,8 @@ var/
 .vscode/
 
 .coverage
+coverage.json
+coverage.xml
 htmlcov/*
 
 .env
