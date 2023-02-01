@@ -128,7 +128,7 @@ FLAGS:
 | --end        |    end of period for stats fetched [exclusive]    | now (UTC) |
 | --start      | beginning of period for stats fetched [inclusive] | --end minus 1 day @midnight |
 | --is-utc     | whether start/stop are already in UTC time        | False |
-| --output-dir |          directory to hold stats exports          | current working directory |
+| --output_dir |          directory to hold stats exports          | current working directory |
 | --creds      |              path to credentials file             | ~/.medium_stats.ini |
 | --sid        |          your Medium session id from cookie       |
 | --uid        |          your Medium user id from cookie          |
